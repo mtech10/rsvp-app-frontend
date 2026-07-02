@@ -21,6 +21,7 @@ const EventCardOpened = ({
   onRsvp,
   onClose,
   onNavigate,
+  onCancel,
   isRsvpView = false,
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
@@ -182,7 +183,24 @@ const EventCardOpened = ({
 
           {isRsvpView ? (
             <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h4 className="font-semibold text-slate-900">RSVP Status</h4>
+              <h4 className="text-3xl  text-slate-900">You're In</h4>
+              <p className="text-xl text-slate-500">Ticket: {event.name}</p>
+              <div className="flex gap-1">
+                <p className="text-md text-slate-900">
+                  No longer able to attend? Notify the host by
+                </p>
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onCancel?.(event.api_id);
+                    onClose();
+                  }}
+                  className="text-rose-700 hover:border-b cursor-pointer"
+                >
+                  canceling your registration.
+                </span>
+              </div>
+
               <div className="mt-4 flex items-center gap-3">
                 <div
                   className={`px-4 py-1.5 rounded-full text-sm font-bold 

@@ -9,21 +9,24 @@ import CreateEvent from "./pages/CreateEvent";
 import SearchPage from "./pages/SearchPage";
 import NotificationPage from "./pages/NotificationPage";
 import CategoryPage from "./pages/CategoryPage";
+import { RSVPProvider } from "./context/RSVPContext";
 
 const App = () => {
   return (
     <div className="min-h-screen bg-linear-to-t from-slate-50 to-blue-100">
       <Topbar />
       <main className="mx-auto max-w-6xl px-6 py-10">
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/calendars" element={<CalendarPage />} />
-          <Route path="/discover" element={<DiscoverEvents />} />
-          <Route path="/create" element={<CreateEvent />} />
-          <Route path="/search" element={<SearchPage />} />
-          <Route path="/notifications" element={<NotificationPage />} />
-          <Route path="/category/:categoryName" element={<CategoryPage />} />
-        </Routes>
+        <RSVPProvider>
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/calendars" element={<CalendarPage />} />
+            <Route path="/discover" element={<DiscoverEvents />} />
+            <Route path="/create" element={<CreateEvent />} />
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/notifications" element={<NotificationPage />} />
+            <Route path="/category/:categoryName" element={<CategoryPage />} />
+          </Routes>
+        </RSVPProvider>
       </main>
       <Footer />
     </div>

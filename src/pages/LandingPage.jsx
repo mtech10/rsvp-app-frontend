@@ -1,12 +1,39 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { useRSVP } from "../context/RSVPContext";
 import { formatDateParts } from "../utility/dateUtility";
 import { MapPin } from "lucide-react";
 import EventCardOpened from "./EventCardOpened";
 
 const LandingPage = () => {
-  const { rsvpEvents } = useRSVP();
-  const [selectedEvent, setSelectedEvent] = useState(null);
+  const { rsvpEvents, cancelRsvp } = useRSVP();
+  const [selectedId, setSelectedId] = useState(null);
+
+  const selectedEvent = useMemo(
+    () => rsvpEvents.find((event) => event.api_id === selectedId) || null,
+    [rsvpEvents, selectedId],
+  );
+
+  useEffect(() => {
+    if (selectedId) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "auto";
+    }
+
+    return () => {
+      document.body.style.overflow = "auto";
+    };
+  }, [selectedId]);
+
+  const handleNavigate = (direction) => {
+    const currentIndex = rsvpEvents.findIndex((e) => e.api_id === selectedId);
+    const nextIndex =
+      direction === "next" ? currentIndex + 1 : currentIndex - 1;
+
+    if (rsvpEvents[nextIndex]) {
+      setSelectedId(rsvpEvents[nextIndex].api_id);
+    }
+  };
 
   return (
     <section className="mx-auto max-w-6xl px-20 py-5">
@@ -59,7 +86,7 @@ const LandingPage = () => {
               <article
                 key={event.api_id}
                 className="flex gap-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
-                onClick={() => setSelectedEvent(event)}
+                onClick={() => setSelectedId(event.api_id)}
               >
                 <div className="flex flex-col px-4 shrink-0">
                   <span className="text-base font-semibold text-slate-900">
@@ -110,7 +137,7 @@ const LandingPage = () => {
       {selectedEvent && (
         <div
           className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 px-4 py-2 backdrop-blur-sm"
-          onClick={() => setSelectedEvent(null)}
+          onClick={() => setSelectedId(null)}
         >
           <div
             className="relative flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl"
@@ -119,7 +146,9 @@ const LandingPage = () => {
             <EventCardOpened
               event={selectedEvent}
               isRsvpView={true}
-              onClose={() => setSelectedEvent(null)}
+              onClose={() => setSelectedId(null)}
+              onCancel={cancelRsvp}
+              onNavigate={handleNavigate}
             />
           </div>
         </div>
