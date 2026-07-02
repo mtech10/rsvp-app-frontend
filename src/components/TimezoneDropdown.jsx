@@ -15,7 +15,7 @@ const TimezoneDropdown = ({ value, onSelect }) => {
 
   return (
     <div className="w-80 rounded-2xl border border-slate-200 bg-white shadow-xl">
-      <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-3">
+      <div className="flex items-center gap-2 border-b border-slate-100 px-4 py-4">
         <Search size={16} className="text-slate-400" />
         <input
           autoFocus
@@ -26,7 +26,7 @@ const TimezoneDropdown = ({ value, onSelect }) => {
         />
       </div>
 
-      <div className="max-h-48 overflow-y-auto p-2">
+      <div className="max-h-48 overflow-y-auto p-4">
         {!results && (
           <p className="px-2 pb-1 pt-2 text-xs font-medium text-slate-400">
             Popular Timezones
@@ -45,7 +45,7 @@ const TimezoneDropdown = ({ value, onSelect }) => {
               key={tz.id}
               onClick={() => onSelect(tz)}
               className={[
-                "flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left transition",
+                "flex w-full items-center justify-between rounded-lg px-3 py-4 text-left transition",
                 selected ? "bg-indigo-50" : "hover:bg-slate-50",
               ].join(" ")}
             >
