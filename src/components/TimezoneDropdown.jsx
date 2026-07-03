@@ -7,7 +7,7 @@ const TimezoneDropdown = ({ value, onSelect }) => {
 
   const results = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return null; // null = show "Popular Timezones" instead
+    if (!q) return null;
     return TIMEZONES.filter((tz) => tz.label.toLowerCase().includes(q));
   }, [query]);
 

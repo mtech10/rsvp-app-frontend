@@ -1,6 +1,5 @@
 import React, { useEffect, useRef } from "react";
 
-// Builds ["00:00", "00:30", ..., "23:30"] as 24hr "HH:MM" values.
 const TIME_OPTIONS = Array.from({ length: 48 }, (_, i) => {
   const hours = String(Math.floor(i / 2)).padStart(2, "0");
   const minutes = i % 2 === 0 ? "00" : "30";

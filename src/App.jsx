@@ -6,10 +6,10 @@ import LandingPage from "./pages/LandingPage";
 import CalendarPage from "./pages/CalendarPage";
 import DiscoverEvents from "./pages/DiscoverEvents";
 import CreateEvent from "./pages/CreateEvent";
-import SearchPage from "./pages/SearchPage";
 import NotificationPage from "./pages/NotificationPage";
 import CategoryPage from "./pages/CategoryPage";
 import { RSVPProvider } from "./context/RSVPContext";
+import SearchModal from "./components/SearchModal";
 
 const App = () => {
   return (
@@ -22,7 +22,7 @@ const App = () => {
             <Route path="/calendars" element={<CalendarPage />} />
             <Route path="/discover" element={<DiscoverEvents />} />
             <Route path="/create" element={<CreateEvent />} />
-            <Route path="/search" element={<SearchPage />} />
+            <Route path="/search" element={<SearchModal />} />
             <Route path="/notifications" element={<NotificationPage />} />
             <Route path="/category/:categoryName" element={<CategoryPage />} />
           </Routes>

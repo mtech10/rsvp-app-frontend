@@ -1,9 +1,5 @@
 import React, { useState } from "react";
 
-/**
- * value: { isPaid: boolean, price: string }
- * onDone: (nextValue) => void
- */
 const TicketPriceDropdown = ({ value, onDone }) => {
   const [isPaid, setIsPaid] = useState(value.isPaid);
   const [price, setPrice] = useState(value.price || "");
