@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useRSVP } from "../context/RSVPContext";
 import { formatDateParts } from "../utility/dateUtility";
 import { MapPin } from "lucide-react";
@@ -8,11 +9,19 @@ const LandingPage = () => {
   const { rsvpEvents, cancelRsvp } = useRSVP();
   const [selectedId, setSelectedId] = useState(null);
 
-  const selectedEvent = useMemo(
-    () => rsvpEvents.find((event) => event.api_id === selectedId) || null,
-    [rsvpEvents, selectedId],
-  );
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [externalEvent, setExternalEvent] = useState(null);
 
+  const selectedEvent = useMemo(
+    () =>
+      (externalEvent?.api_id === selectedId || externalEvent?.id === selectedId
+        ? externalEvent
+        : null) ||
+      rsvpEvents.find((event) => event.api_id === selectedId) ||
+      null,
+    [rsvpEvents, selectedId, externalEvent],
+  );
   useEffect(() => {
     if (selectedId) {
       document.body.style.overflow = "hidden";
@@ -24,6 +33,16 @@ const LandingPage = () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedId]);
+
+  useEffect(() => {
+    if (location.state?.openEvent) {
+      setExternalEvent(location.state.openEvent);
+      setSelectedId(
+        location.state.openEvent.api_id || location.state.openEvent.id,
+      );
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
 
   const handleNavigate = (direction) => {
     const currentIndex = rsvpEvents.findIndex((e) => e.api_id === selectedId);
@@ -85,7 +104,7 @@ const LandingPage = () => {
             return (
               <article
                 key={event.api_id}
-                className="flex gap-6 rounded-lg border border-slate-200 bg-white p-6 shadow-sm"
+                className="flex gap-6 rounded-lg border border-slate-200 cursor-pointer bg-white p-6 shadow-sm"
                 onClick={() => setSelectedId(event.api_id)}
               >
                 <div className="flex flex-col px-4 shrink-0">

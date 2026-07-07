@@ -85,6 +85,11 @@ const SearchModal = ({ isOpen, onClose }) => {
     navigate(path);
   };
 
+  const handleEventClick = (event) => {
+    onClose();
+    navigate("/", { state: { openEvent: event } });
+  };
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-start justify-center bg-slate-900/40 pt-20 px-4 backdrop-blur-sm animate-in fade-in duration-150"
@@ -161,9 +166,7 @@ const SearchModal = ({ isOpen, onClose }) => {
                     return (
                       <button
                         key={ev.id || idx}
-                        onClick={() =>
-                          handleAction(`/event/${ev.id || ev.api_id}`)
-                        }
+                        onClick={() => handleEventClick(ev)}
                         className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left hover:bg-slate-100 transition-colors group"
                       >
                         <div className="flex flex-col items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white shrink-0 shadow-2xs">
@@ -205,10 +208,8 @@ const SearchModal = ({ isOpen, onClose }) => {
                     const badge = getBadgeDate(ev.start_at || ev.startDate);
                     return (
                       <button
-                        key={ev.api_id || idx}
-                        onClick={() =>
-                          handleAction(`/event/${ev.api_id || ev.id}`)
-                        }
+                        key={ev.id || idx}
+                        onClick={() => handleEventClick(ev)}
                         className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-left hover:bg-slate-100 transition-colors group"
                       >
                         <div className="flex flex-col items-center justify-center w-9 h-9 rounded-lg border border-slate-200 bg-white shrink-0 shadow-2xs">

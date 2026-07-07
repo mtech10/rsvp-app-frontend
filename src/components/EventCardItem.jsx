@@ -36,7 +36,7 @@ const EventCardItem = ({ event, selected, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`group flex w-full overflow-hidden rounded-xl border p-0 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${
+      className={`group flex w-full overflow-hidden rounded-xl border p-0 text-left transition cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${
         selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
       }`}
     >
