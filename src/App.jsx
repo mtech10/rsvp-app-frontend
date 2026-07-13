@@ -1,36 +1,41 @@
-import React, { useState } from "react";
 import { Routes, Route } from "react-router-dom";
-import Topbar from "./components/Topbar";
-import Footer from "./components/Footer";
+
 import LandingPage from "./pages/LandingPage";
 import CalendarPage from "./pages/CalendarPage";
 import DiscoverEvents from "./pages/DiscoverEvents";
 import CreateEvent from "./pages/CreateEvent";
 import NotificationPage from "./pages/NotificationPage";
 import CategoryPage from "./pages/CategoryPage";
-import { RSVPProvider } from "./context/RSVPContext";
 import SearchModal from "./components/SearchModal";
 
-const App = () => {
-  return (
-    <div className="min-h-screen bg-linear-to-t from-slate-50 to-blue-100">
-      <Topbar />
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <RSVPProvider>
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/calendars" element={<CalendarPage />} />
-            <Route path="/discover" element={<DiscoverEvents />} />
-            <Route path="/create" element={<CreateEvent />} />
-            <Route path="/search" element={<SearchModal />} />
-            <Route path="/notifications" element={<NotificationPage />} />
-            <Route path="/category/:categoryName" element={<CategoryPage />} />
-          </Routes>
-        </RSVPProvider>
-      </main>
-      <Footer />
-    </div>
-  );
-};
+import Login from "./pages/Login";
+import Register from "./pages/Register";
 
-export default App;
+import { RSVPProvider } from "./context/RSVPContext";
+import ProtectedRoute from "./components/ProtectedRoute";
+import MainLayout from "./components/layouts/MainLayout";
+
+export default function App() {
+  return (
+    <RSVPProvider>
+      <Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+
+        <Route element={<MainLayout />}>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/calendars" element={<CalendarPage />} />
+          <Route path="/discover" element={<DiscoverEvents />} />
+          <Route path="/search" element={<SearchModal />} />
+          <Route path="/notifications" element={<NotificationPage />} />
+          <Route path="/category/:categoryName" element={<CategoryPage />} />
+        </Route>
+        <Route element={<ProtectedRoute />}>
+          <Route element={<MainLayout />}>
+            <Route path="/create" element={<CreateEvent />} />
+          </Route>
+        </Route>
+      </Routes>
+    </RSVPProvider>
+  );
+}
