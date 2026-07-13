@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { getMyEvents } from "../services/eventService";
+import { useNavigate } from "react-router-dom";
 
 export default function MyEvents() {
+  const navigate = useNavigate();
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -43,6 +45,9 @@ export default function MyEvents() {
               <p>{event.visibility}</p>
 
               <p>{event.ticketType}</p>
+              <button onClick={() => navigate(`/my-events/${event._id}`)}>
+                Manage
+              </button>
             </div>
           ))}
         </div>

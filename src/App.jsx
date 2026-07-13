@@ -14,7 +14,8 @@ import Register from "./pages/Register";
 import { RSVPProvider } from "./context/RSVPContext";
 import ProtectedRoute from "./components/ProtectedRoute";
 import MainLayout from "./components/layouts/MainLayout";
-
+import MyEvents from "./pages/MyEvents";
+import ManageEvent from "./pages/ManageEvent";
 export default function App() {
   return (
     <RSVPProvider>
@@ -34,6 +35,7 @@ export default function App() {
           <Route element={<MainLayout />}>
             <Route path="/create" element={<CreateEvent />} />
             <Route path="/my-events" element={<MyEvents />} />
+            <Route path="/my-events/:id" element={<ManageEvent />} />
           </Route>
         </Route>
       </Routes>

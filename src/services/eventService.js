@@ -25,3 +25,7 @@ export function getEvent(id) {
     },
   });
 }
+
+export function getEvents() {
+  return apiFetch("/events");
+}
