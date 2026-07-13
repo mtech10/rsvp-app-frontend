@@ -33,6 +33,7 @@ export default function App() {
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/create" element={<CreateEvent />} />
+            <Route path="/my-events" element={<MyEvents />} />
           </Route>
         </Route>
       </Routes>

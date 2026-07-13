@@ -32,6 +32,9 @@ import {
 import CenterModal from "../components/CenterModal";
 import ConnectMeetingModal from "../components/ConnectMeetingModal";
 
+import { createEvent } from "../services/eventService";
+import { useNavigate } from "react-router-dom";
+
 const THEMES = ["Minimal", "Vibrant", "Elegant", "Bold"];
 
 function getCityFromLabel(label) {
@@ -147,6 +150,7 @@ const CreateEventPage = ({ onCreateEvent }) => {
   const [connectProvider, setConnectProvider] = useState(null); // "zoom" | "google_meet" | null
 
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const handlePickImage = () => fileInputRef.current?.click();
 
@@ -178,22 +182,45 @@ const CreateEventPage = ({ onCreateEvent }) => {
 
     setSubmitting(true);
     try {
-      await onCreateEvent?.({
-        name: eventName.trim(),
+      const startAt = new Date(
+        `${startDate.toISOString().split("T")[0]}T${startTime}`,
+      );
+
+      const endAt = new Date(
+        `${endDate.toISOString().split("T")[0]}T${endTime}`,
+      );
+
+      await createEvent({
+        title: eventName,
+        description,
         coverUrl: imageUrl,
         theme,
-        startDate,
-        endDate,
-        startTime,
-        endTime,
+
+        startAt,
+        endAt,
+
         timezone: timezone.id,
-        location,
-        description,
+
+        locationType: location ? "in_person" : "online",
+
+        venue: location?.name,
+
+        address: location?.address,
+
+        city: location?.address ? getCityFromLabel(location.address) : "",
+
         visibility,
-        ticketPrice: ticket.isPaid ? ticket.price : "Free",
-        requireApproval,
+
+        ticketType: ticket.isPaid ? "paid" : "free",
+
+        price: ticket.isPaid ? Number(ticket.price) : 0,
+
         capacity,
+
+        requireApproval,
       });
+
+      navigate("/my-events");
     } finally {
       setSubmitting(false);
     }

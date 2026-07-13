@@ -4,7 +4,6 @@ import { getCurrentUser } from "../services/authService";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  console.log("AuthProvider mounted");
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -57,7 +56,6 @@ export function AuthProvider({ children }) {
     login,
     logout,
   };
-  console.log("Context value:", value);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
