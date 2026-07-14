@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import Category from "../components/Category";
-import EventCards from "../components/EventCards";
+import EventCards from "../components/events/EventCards";
 
 const DiscoverEvents = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);

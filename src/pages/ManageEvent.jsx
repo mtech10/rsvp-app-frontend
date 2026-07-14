@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { getEvent } from "../services/eventService";
 import { deleteEvent } from "../services/eventService";
+import EventDetailsLayout from "../components/events/EventDetailsLayout";
 
 export default function ManageEvent() {
   const { id } = useParams();
@@ -50,24 +51,10 @@ export default function ManageEvent() {
   if (error) return <h2>{error}</h2>;
 
   return (
-    <div className="mx-auto max-w-4xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">{event.title}</h1>
-
-      <div className="flex gap-4">
-        <button
-          onClick={() => navigate(`/my-events/${event._id}/edit`)}
-          className="rounded-lg bg-blue-600 px-5 py-2 text-white hover:bg-blue-700"
-        >
-          Edit Event
-        </button>
-
-        <button
-          onClick={handleDelete}
-          className="rounded-lg bg-red-600 px-5 py-2 text-white hover:bg-red-700"
-        >
-          Delete Event
-        </button>
-      </div>
-    </div>
+    <EventDetailsLayout
+      event={event}
+      mode="organizer"
+      onClose={() => navigate("/my-events")}
+    />
   );
 }

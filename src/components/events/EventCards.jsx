@@ -1,8 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { getEvents } from "../data";
-import EventCardOpened from "../pages/EventCardOpened";
+import EventDetailsLayout from "./EventDetailsLayout";
 import EventCardItem from "./EventCardItem";
-import { useRSVP } from "../context/RSVPContext";
+import { useRSVP } from "../../context/RSVPContext";
 
 const EventCards = ({ category = null, showAll = false }) => {
   const { events = [] } = getEvents({

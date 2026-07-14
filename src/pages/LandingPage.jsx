@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useRSVP } from "../context/RSVPContext";
 import { formatDateParts } from "../utility/dateUtility";
 import { MapPin } from "lucide-react";
-import EventCardOpened from "./EventCardOpened";
+import EventCardOpened from "../components/events/EventDetailsLayout";
 
 const LandingPage = () => {
   const { rsvpEvents, cancelRsvp } = useRSVP();

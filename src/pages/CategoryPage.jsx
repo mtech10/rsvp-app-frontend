@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { getEvents } from "../data";
-import EventCards from "../components/EventCards";
+import EventCards from "../components/events/EventCards";
 import CategoryHero from "../components/CategoryHero";
 
 const CategoryPage = () => {

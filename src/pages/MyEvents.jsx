@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { getMyEvents } from "../services/eventService";
 import { useNavigate } from "react-router-dom";
-import EventCardItem from "../components/EventCardItem";
+import EventCardItem from "../components/events/EventCardItem";
 
 export default function MyEvents() {
   const navigate = useNavigate();

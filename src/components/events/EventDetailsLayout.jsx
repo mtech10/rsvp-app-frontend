@@ -13,9 +13,9 @@ import {
   X,
 } from "lucide-react";
 import React, { useState } from "react";
-import { formatDateParts } from "../utility/dateUtility";
+import { formatDateParts } from "../../utility/dateUtility";
 
-const EventCardOpened = ({
+const EventDetailsLayout = ({
   event,
   events = [],
   onRsvp,
@@ -23,18 +23,21 @@ const EventCardOpened = ({
   onNavigate,
   onCancel,
   isRsvpView = false,
+  mode = "public",
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
   if (!event) return null;
 
-  const date = formatDateParts(event.start_at);
-  const endDate = formatDateParts(event.end_at);
+  const isOrganizer = mode === "organizer";
+
+  const date = formatDateParts(event.startAt);
+  const endDate = formatDateParts(event.endAt);
   const addressLabel =
     event.address || event.venue || "Location details coming soon";
   const cityLabel =
     event.city ||
-    (event.location_type === "online" ? "Online" : "Various locations");
+    (event.locationType === "online" ? "Online" : "Various locations");
 
   const handleIncrement = () => setTicketCount((prev) => prev + 1);
   const handleDecrement = () =>
@@ -56,10 +59,10 @@ const EventCardOpened = ({
     </div>
   );
 
-  const ticketType = event.ticket_type?.toLowerCase().trim() || "";
+  const ticketType = event.ticketType?.toLowerCase().trim() || "";
   const isRegistration = ticketType === "registration";
   const isApprovalRequired =
-    ticketType.includes("approval") || event.require_approval;
+    ticketType.includes("approval") || event.requireApproval;
   const isFree = ticketType === "free";
   const isPaid = ticketType === "paid";
   const isPaidOrRegistration = isPaid || isRegistration;
@@ -90,15 +93,16 @@ const EventCardOpened = ({
           >
             <ChevronsRight size={20} />
           </button>
-
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-              <Copy size={14} /> Copy Link
-            </button>
-            <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-              Event Page <ArrowUpRight size={14} />
-            </button>
-          </div>
+          {!isOrganizer && (
+            <div className="flex items-center gap-2">
+              <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
+                <Copy size={14} /> Copy Link
+              </button>
+              <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
+                Event Page <ArrowUpRight size={14} />
+              </button>
+            </div>
+          )}
 
           <div className="flex items-center gap-1 text-slate-400">
             <button
@@ -118,21 +122,25 @@ const EventCardOpened = ({
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20 pt-8 sm:px-12">
           <div className="relative flex justify-center">
             <img
-              src={event.cover_url}
-              alt={`${event.name} event cover`}
+              src={event.coverUrl}
+              alt={`${event.title} event cover`}
               loading="lazy"
               className="h-full w-full object-cover shadow-2xl transition duration-300 hover:scale-105 rounded-xl sm:w-100"
             />
           </div>
-          <div className="mt-10 flex items-center gap-2 text-sm text-slate-500">
-            <span className="flex items-center rounded-md bg-slate-100 p-1 text-slate-500">
-              <Building2 size={14} />
-            </span>
-            Featured in{" "}
-            <span className="font-semibold text-slate-800">{cityLabel}</span>
+          <div className="mt-10 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-semibold">
+              {event.host?.name?.charAt(0)}
+            </div>
+
+            <div>
+              <p className="text-sm text-slate-500">Hosted by</p>
+
+              <p className="font-semibold">{event.host?.name}</p>
+            </div>
           </div>
           <div className="flex justify-between">
-            <h3 className="text-3xl font-bold text-slate-900">{event.name}</h3>
+            <h3 className="text-3xl font-bold text-slate-900">{event.title}</h3>
           </div>
 
           <div className="mt-10 flex justify-between gap-4 sm:items-center rounded-3xl bg-slate-50">
@@ -175,6 +183,74 @@ const EventCardOpened = ({
             </p>
           </div>
 
+          <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-5 text-lg font-semibold text-slate-900">
+              Organizer Actions
+            </h2>
+
+            <div className="space-y-3">
+              <button className="w-full rounded-xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50">
+                ✏️ Edit Event
+              </button>
+
+              <button className="w-full rounded-xl border border-red-200 px-4 py-3 text-left text-red-600 transition hover:bg-red-50">
+                🗑 Delete Event
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-5 text-lg font-semibold">Event Settings</h2>
+
+            <div className="space-y-4">
+              <div className="flex justify-between">
+                <span className="text-slate-500">Visibility</span>
+                <span className="font-medium capitalize">
+                  {event.visibility}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-slate-500">Ticket</span>
+                <span className="font-medium capitalize">
+                  {event.ticketType}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-slate-500">Capacity</span>
+                <span className="font-medium">
+                  {event.capacity || "Unlimited"}
+                </span>
+              </div>
+
+              <div className="flex justify-between">
+                <span className="text-slate-500">Timezone</span>
+                <span className="font-medium">{event.timezone}</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-3 text-lg font-semibold">Guests</h2>
+
+            <p className="text-slate-500">RSVP management will appear here.</p>
+
+            <div className="mt-5 rounded-xl bg-slate-50 p-6 text-center">
+              <h3 className="text-2xl font-bold">0</h3>
+
+              <p className="text-sm text-slate-500">Registered Guests</p>
+            </div>
+          </div>
+
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+            <h2 className="mb-3 text-lg font-semibold">Analytics</h2>
+
+            <p className="text-slate-500">
+              Event insights and attendance analytics are coming soon.
+            </p>
+          </div>
+
           <div className="mt-6 flex items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
               {event.rsvp_count || 0} people going
@@ -184,7 +260,7 @@ const EventCardOpened = ({
           {isRsvpView ? (
             <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h4 className="text-3xl  text-slate-900">You're In</h4>
-              <p className="text-xl text-slate-500">Ticket: {event.name}</p>
+              <p className="text-xl text-slate-500">Ticket: {event.title}</p>
               <div className="flex gap-1">
                 <p className="text-md text-slate-900">
                   No longer able to attend? Notify the host by
@@ -351,4 +427,4 @@ const EventCardOpened = ({
   );
 };
 
-export default EventCardOpened;
+export default EventDetailsLayout;
