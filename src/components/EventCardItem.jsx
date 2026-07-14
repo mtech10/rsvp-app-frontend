@@ -24,13 +24,19 @@ const formatEventDate = (value) => {
   return `${dayLabel}, ${time}`;
 };
 
-const EventCardItem = ({ event, selected, onClick }) => {
-  const dateText = formatEventDate(event.start_at);
+const EventCardItem = ({
+  event,
+  selected,
+  onClick,
+  variant = "discover",
+  onManage,
+}) => {
+  const dateText = formatEventDate(event.startAt);
   const address =
     event.address || event.venue || "Location details coming soon";
   const city =
     event.city ||
-    (event.location_type === "online" ? "Online" : "Various locations");
+    (event.locationType === "online" ? "Online" : "Various locations");
 
   return (
     <button
@@ -42,8 +48,8 @@ const EventCardItem = ({ event, selected, onClick }) => {
     >
       <div className="relative  w-32 overflow-hidden  sm:w-32 shrink-0">
         <img
-          src={event.cover_url}
-          alt={event.name}
+          src={event.coverUrl || "https://placehold.co/600x400?text=Event"}
+          alt={event.title}
           className=" h-full w-full object-cover"
           loading="lazy"
         />
@@ -54,13 +60,18 @@ const EventCardItem = ({ event, selected, onClick }) => {
             {dateText}
           </p>
           <h3 className="mt-2 text-base font-semibold text-slate-900 line-clamp-2">
-            {event.name}
+            {event.title}
           </h3>
           <p className="mt-1 text-sm leading-6 text-slate-600">{address}</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">{city}</p>
+          <p className="mt-1 text-sm font-semibold text-slate-900">
+            {event.rsvpCount || 0} attending
+          </p>
         </div>
+
         <div className="flex items-center justify-between text-xs text-slate-500">
-          <span>{event.rsvp_count || 0} attending</span>
+          {variant === "discover" && (
+            <span>{event.rsvpCount || 0} attending</span>
+          )}
         </div>
       </div>
     </button>
