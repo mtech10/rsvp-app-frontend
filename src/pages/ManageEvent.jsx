@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { getEvent } from "../services/eventService";
 import { deleteEvent } from "../services/eventService";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
+import { getGuests } from "../services/rsvpService";
 
 export default function ManageEvent() {
   const { id } = useParams();
@@ -11,12 +12,15 @@ export default function ManageEvent() {
   const [event, setEvent] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [guests, setGuests] = useState([]);
 
   useEffect(() => {
     async function fetchEvent() {
       try {
         const data = await getEvent(id);
         setEvent(data.event);
+        const guestData = await getGuests(id);
+        setGuests(guestData.guests);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -55,6 +59,7 @@ export default function ManageEvent() {
       event={event}
       mode="organizer"
       onClose={() => navigate("/my-events")}
+      guests={guests}
     />
   );
 }

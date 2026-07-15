@@ -4,26 +4,15 @@ export function createEvent(eventData) {
   return apiFetch("/events", {
     method: "POST",
     body: JSON.stringify(eventData),
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
   });
 }
 
 export function getMyEvents() {
-  return apiFetch("/events/my-events", {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+  return apiFetch("/events/my-events", {});
 }
 
 export function getEvent(id) {
-  return apiFetch(`/events/${id}`, {
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
-  });
+  return apiFetch(`/events/${id}`, {});
 }
 
 export function getEvents() {
@@ -34,18 +23,12 @@ export function updateEvent(id, eventData) {
   return apiFetch(`/events/${id}`, {
     method: "PATCH",
     body: JSON.stringify(eventData),
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
   });
 }
 
 export function deleteEvent(id) {
   return apiFetch(`/events/${id}`, {
     method: "DELETE",
-    headers: {
-      Authorization: `Bearer ${localStorage.getItem("token")}`,
-    },
   });
 }
 

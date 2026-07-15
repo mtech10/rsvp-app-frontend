@@ -14,10 +14,14 @@ import {
 } from "lucide-react";
 import React, { useState } from "react";
 import { formatDateParts } from "../../utility/dateUtility";
+import { createRSVP } from "../../services/rsvpService";
+import { useNavigate } from "react-router-dom";
+import { deleteEvent } from "../../services/eventService";
 
 const EventDetailsLayout = ({
   event,
   events = [],
+  guests = [],
   onRsvp,
   onClose,
   onNavigate,
@@ -42,6 +46,9 @@ const EventDetailsLayout = ({
   const handleIncrement = () => setTicketCount((prev) => prev + 1);
   const handleDecrement = () =>
     setTicketCount((prev) => (prev > 1 ? prev - 1 : 1));
+  const [loading, setLoading] = useState(false);
+
+  const [myRSVP, setMyRSVP] = useState(null);
 
   const UserProfileInfo = () => (
     <div className="flex items-center gap-3 py-4">
@@ -66,22 +73,50 @@ const EventDetailsLayout = ({
   const isFree = ticketType === "free";
   const isPaid = ticketType === "paid";
   const isPaidOrRegistration = isPaid || isRegistration;
-  console.log("Current Event Type:", ticketType);
 
-  const handleRsvpAction = (status, tickets = 1) => {
-    onRsvp({ api_id: event.api_id, status, tickets });
-    onClose();
+  const handleRsvpAction = async (tickets = 1) => {
+    try {
+      setLoading(true);
+
+      const response = await createRSVP(event._id, tickets);
+
+      alert(response.message);
+
+      onClose();
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const submitApprovalRequest = (e) => {
     e.preventDefault();
     onRsvp({
-      api_id: event.api_id,
+      _id: event._id,
       status: "pending",
       tickets: ticketCount,
     });
     setShowApprovalForm(false);
     onClose();
+  };
+  const navigate = useNavigate();
+  const handleDelete = async () => {
+    const confirmed = window.confirm(
+      "Are you sure you want to delete this event?",
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await deleteEvent(event._id);
+
+      alert("Event deleted successfully.");
+
+      navigate("/my-events");
+    } catch (error) {
+      alert(error.message);
+    }
   };
   return (
     <>
@@ -183,21 +218,29 @@ const EventDetailsLayout = ({
             </p>
           </div>
 
-          <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-5 text-lg font-semibold text-slate-900">
-              Organizer Actions
-            </h2>
+          {isOrganizer && (
+            <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-5 text-lg font-semibold text-slate-900">
+                Organizer Actions
+              </h2>
 
-            <div className="space-y-3">
-              <button className="w-full rounded-xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50">
-                ✏️ Edit Event
-              </button>
+              <div className="space-y-3">
+                <button
+                  onClick={() => navigate(`/my-events/${event._id}/edit`)}
+                  className="w-full rounded-xl border border-slate-200 px-4 py-3 text-left transition hover:bg-slate-50"
+                >
+                  ✏️ Edit Event
+                </button>
 
-              <button className="w-full rounded-xl border border-red-200 px-4 py-3 text-left text-red-600 transition hover:bg-red-50">
-                🗑 Delete Event
-              </button>
+                <button
+                  onClick={handleDelete}
+                  className="w-full rounded-xl border border-red-200 px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
+                >
+                  🗑 Delete Event
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h2 className="mb-5 text-lg font-semibold">Event Settings</h2>
@@ -231,25 +274,54 @@ const EventDetailsLayout = ({
             </div>
           </div>
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold">Guests</h2>
+          {isOrganizer && (
+            <div className="space-y-3">
+              {guests.length === 0 ? (
+                <p className="text-sm text-slate-500">No guests yet.</p>
+              ) : (
+                guests.map((guest) => (
+                  <div
+                    key={guest._id}
+                    className="flex items-center justify-between rounded-xl border p-4"
+                  >
+                    <div>
+                      <h4 className="font-semibold">{guest.user?.name}</h4>
 
-            <p className="text-slate-500">RSVP management will appear here.</p>
+                      <p className="text-sm text-slate-500">
+                        {guest.user?.email}
+                      </p>
+                    </div>
 
-            <div className="mt-5 rounded-xl bg-slate-50 p-6 text-center">
-              <h3 className="text-2xl font-bold">0</h3>
+                    <div className="text-right">
+                      <span
+                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                          guest.status === "going"
+                            ? "bg-green-100 text-green-700"
+                            : "bg-yellow-100 text-yellow-700"
+                        }`}
+                      >
+                        {guest.status}
+                      </span>
 
-              <p className="text-sm text-slate-500">Registered Guests</p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        {guest.tickets} ticket(s)
+                      </p>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
-          </div>
+          )}
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-3 text-lg font-semibold">Analytics</h2>
+          {isOrganizer && (
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-3 text-lg font-semibold">Analytics</h2>
 
-            <p className="text-slate-500">
-              Event insights and attendance analytics are coming soon.
-            </p>
-          </div>
+              <p className="text-slate-500">
+                Event insights and attendance analytics are coming soon.
+              </p>
+            </div>
+          )}
 
           <div className="mt-6 flex items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
@@ -268,7 +340,7 @@ const EventDetailsLayout = ({
                 <span
                   onClick={(e) => {
                     e.stopPropagation();
-                    onCancel?.(event.api_id);
+                    onCancel?.(event._id);
                     onClose();
                   }}
                   className="text-rose-700 hover:border-b cursor-pointer"
@@ -352,10 +424,11 @@ const EventDetailsLayout = ({
                     <UserProfileInfo />
 
                     <button
-                      onClick={() => handleRsvpAction("going", 1)}
-                      className="mt-2 w-full rounded-xl bg-[#2C2C2C] py-3 text-sm font-bold text-white transition hover:bg-black"
+                      disabled={loading}
+                      onClick={() => handleRsvpAction(1)}
+                      className="mt-2 w-full rounded-xl bg-[#2C2C2C] py-3 text-sm font-bold text-white transition hover:bg-black disabled:opacity-50"
                     >
-                      One-Click RSVP
+                      {loading ? "Registering..." : "One-Click RSVP"}
                     </button>
                   </>
                 ) : isPaidOrRegistration ? (
@@ -368,7 +441,7 @@ const EventDetailsLayout = ({
                     <UserProfileInfo />
 
                     <button
-                      onClick={() => handleRsvpAction("going", 1)}
+                      onClick={() => handleRsvpAction(1)}
                       className="mt-2 w-full rounded-xl bg-[#2C2C2C] py-3 text-sm font-bold text-white transition hover:bg-black"
                     >
                       Register
