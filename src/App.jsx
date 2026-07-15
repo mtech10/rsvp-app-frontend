@@ -17,6 +17,8 @@ import MainLayout from "./components/layouts/MainLayout";
 import MyEvents from "./pages/MyEvents";
 import ManageEvent from "./pages/ManageEvent";
 import EditEvent from "./pages/EditEvent";
+import EventDetails from "./pages/EventDetails";
+
 export default function App() {
   return (
     <RSVPProvider>
@@ -28,6 +30,7 @@ export default function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/calendars" element={<CalendarPage />} />
           <Route path="/discover" element={<DiscoverEvents />} />
+          <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/search" element={<SearchModal />} />
           <Route path="/notifications" element={<NotificationPage />} />
           <Route path="/category/:categoryName" element={<CategoryPage />} />

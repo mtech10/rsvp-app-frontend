@@ -12,14 +12,16 @@ import {
   Plus,
   X,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { formatDateParts } from "../../utility/dateUtility";
 import { createRSVP } from "../../services/rsvpService";
 import { useNavigate } from "react-router-dom";
 import { deleteEvent } from "../../services/eventService";
+import { getMyRSVP } from "../../services/rsvpService";
 
 const EventDetailsLayout = ({
   event,
+  myRSVP,
   events = [],
   guests = [],
   onRsvp,
@@ -47,8 +49,6 @@ const EventDetailsLayout = ({
   const handleDecrement = () =>
     setTicketCount((prev) => (prev > 1 ? prev - 1 : 1));
   const [loading, setLoading] = useState(false);
-
-  const [myRSVP, setMyRSVP] = useState(null);
 
   const UserProfileInfo = () => (
     <div className="flex items-center gap-3 py-4">
@@ -82,7 +82,7 @@ const EventDetailsLayout = ({
 
       alert(response.message);
 
-      onClose();
+      onClose?.();
     } catch (error) {
       alert(error.message);
     } finally {
@@ -92,13 +92,9 @@ const EventDetailsLayout = ({
 
   const submitApprovalRequest = (e) => {
     e.preventDefault();
-    onRsvp({
-      _id: event._id,
-      status: "pending",
-      tickets: ticketCount,
-    });
+    onRsvp(ticketCount);
     setShowApprovalForm(false);
-    onClose();
+    onClose?.();
   };
   const navigate = useNavigate();
   const handleDelete = async () => {
@@ -123,7 +119,7 @@ const EventDetailsLayout = ({
       <div className="flex flex-1 w-full flex-col overflow-hidden bg-white">
         <div className="z-10 flex shrink-0 items-center justify-between border-b border-slate-100 bg-white px-4 py-3">
           <button
-            onClick={onClose}
+            onClick={() => onClose?.()}
             className="rounded-lg p-2 text-slate-500 transition hover:bg-slate-100"
           >
             <ChevronsRight size={20} />
@@ -341,7 +337,7 @@ const EventDetailsLayout = ({
                   onClick={(e) => {
                     e.stopPropagation();
                     onCancel?.(event._id);
-                    onClose();
+                    onClose?.();
                   }}
                   className="text-rose-700 hover:border-b cursor-pointer"
                 >
@@ -425,7 +421,7 @@ const EventDetailsLayout = ({
 
                     <button
                       disabled={loading}
-                      onClick={() => handleRsvpAction(1)}
+                      onClick={() => handleRsvpAction(ticketCount)}
                       className="mt-2 w-full rounded-xl bg-[#2C2C2C] py-3 text-sm font-bold text-white transition hover:bg-black disabled:opacity-50"
                     >
                       {loading ? "Registering..." : "One-Click RSVP"}
@@ -441,7 +437,7 @@ const EventDetailsLayout = ({
                     <UserProfileInfo />
 
                     <button
-                      onClick={() => handleRsvpAction(1)}
+                      onClick={() => handleRsvpAction(ticketCount)}
                       className="mt-2 w-full rounded-xl bg-[#2C2C2C] py-3 text-sm font-bold text-white transition hover:bg-black"
                     >
                       Register
@@ -454,6 +450,47 @@ const EventDetailsLayout = ({
                   </p>
                 )}
               </div>
+            </div>
+          )}
+
+          {myRSVP?.status === "going" && (
+            <div className="mt-12 rounded-2xl border border-green-200 bg-green-50 p-6">
+              <h3 className="text-xl font-bold text-green-700">
+                ✅ You're Going
+              </h3>
+
+              <p className="mt-2 text-slate-700">Tickets: {myRSVP.tickets}</p>
+
+              <button
+                onClick={() => onCancel?.(event._id)}
+                className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-white"
+              >
+                Cancel RSVP
+              </button>
+            </div>
+          )}
+
+          {myRSVP?.status === "pending" && (
+            <div className="mt-12 rounded-2xl border border-yellow-200 bg-yellow-50 p-6">
+              <h3 className="text-xl font-bold text-yellow-700">
+                Pending Approval
+              </h3>
+
+              <p className="mt-2 text-slate-700">
+                Your registration is waiting for the organizer's approval.
+              </p>
+            </div>
+          )}
+
+          {myRSVP?.status === "rejected" && (
+            <div className="mt-12 rounded-2xl border border-red-200 bg-red-50 p-6">
+              <h3 className="text-xl font-bold text-red-700">
+                Registration Declined
+              </h3>
+
+              <p className="mt-2 text-slate-700">
+                The organizer declined your request.
+              </p>
             </div>
           )}
 
