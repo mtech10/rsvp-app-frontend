@@ -20,3 +20,15 @@ export async function getGuests(eventId) {
 export async function getMyRSVP(eventId) {
   return apiFetch(`/events/${eventId}/my-rsvp`);
 }
+
+export async function approveGuest(rsvpId) {
+  return apiFetch(`/events/rsvp/${rsvpId}/approve`, {
+    method: "PATCH",
+  });
+}
+
+export async function rejectGuest(rsvpId) {
+  return apiFetch(`/events/rsvp/${rsvpId}/reject`, {
+    method: "PATCH",
+  });
+}

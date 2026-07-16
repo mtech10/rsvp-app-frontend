@@ -14,21 +14,20 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { formatDateParts } from "../../utility/dateUtility";
-import { createRSVP } from "../../services/rsvpService";
 import { useNavigate } from "react-router-dom";
-import { deleteEvent } from "../../services/eventService";
 import { getMyRSVP } from "../../services/rsvpService";
 
 const EventDetailsLayout = ({
   event,
   myRSVP,
-  events = [],
   guests = [],
+  onApprove,
+  onReject,
+  onDelete,
   onRsvp,
   onClose,
   onNavigate,
   onCancel,
-  isRsvpView = false,
   mode = "public",
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
@@ -78,13 +77,7 @@ const EventDetailsLayout = ({
     try {
       setLoading(true);
 
-      const response = await createRSVP(event._id, tickets);
-
-      alert(response.message);
-
-      onClose?.();
-    } catch (error) {
-      alert(error.message);
+      await onRsvp?.(tickets);
     } finally {
       setLoading(false);
     }
@@ -96,24 +89,7 @@ const EventDetailsLayout = ({
     setShowApprovalForm(false);
     onClose?.();
   };
-  const navigate = useNavigate();
-  const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this event?",
-    );
 
-    if (!confirmed) return;
-
-    try {
-      await deleteEvent(event._id);
-
-      alert("Event deleted successfully.");
-
-      navigate("/my-events");
-    } catch (error) {
-      alert(error.message);
-    }
-  };
   return (
     <>
       <div className="flex flex-1 w-full flex-col overflow-hidden bg-white">
@@ -229,7 +205,7 @@ const EventDetailsLayout = ({
                 </button>
 
                 <button
-                  onClick={handleDelete}
+                  onClick={onDelete}
                   className="w-full rounded-xl border border-red-200 px-4 py-3 text-left text-red-600 transition hover:bg-red-50"
                 >
                   🗑 Delete Event
@@ -271,7 +247,10 @@ const EventDetailsLayout = ({
           </div>
 
           {isOrganizer && (
-            <div className="space-y-3">
+            <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+              <h2 className="mb-5 text-xl font-semibold">
+                Guests ({guests.length})
+              </h2>
               {guests.length === 0 ? (
                 <p className="text-sm text-slate-500">No guests yet.</p>
               ) : (
@@ -299,6 +278,24 @@ const EventDetailsLayout = ({
                         {guest.status}
                       </span>
 
+                      {guest.status === "pending" && (
+                        <div className="mt-3 flex gap-2">
+                          <button
+                            onClick={() => onApprove(guest._id)}
+                            className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
+                          >
+                            Approve
+                          </button>
+
+                          <button
+                            onClick={() => onReject(guest._id)}
+                            className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                          >
+                            Reject
+                          </button>
+                        </div>
+                      )}
+
                       <p className="mt-1 text-xs text-slate-500">
                         {guest.tickets} ticket(s)
                       </p>
@@ -325,7 +322,7 @@ const EventDetailsLayout = ({
             </p>
           </div>
 
-          {isRsvpView ? (
+          {myRSVP ? (
             <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6">
               <h4 className="text-3xl  text-slate-900">You're In</h4>
               <p className="text-xl text-slate-500">Ticket: {event.title}</p>
@@ -350,10 +347,10 @@ const EventDetailsLayout = ({
                   className={`px-4 py-1.5 rounded-full text-sm font-bold 
             ${event.status === "going" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
                 >
-                  {event.status === "going" ? "Going" : "Pending Approval"}
+                  {myRSVP.status === "going" ? "Going" : "Pending Approval"}
                 </div>
                 <p className="text-sm text-slate-600">
-                  {event.tickets || 1} ticket(s) booked
+                  {myRSVP.tickets || 1} ticket(s) booked
                 </p>
               </div>
             </div>
