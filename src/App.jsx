@@ -32,7 +32,6 @@ export default function App() {
           <Route path="/discover" element={<DiscoverEvents />} />
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/search" element={<SearchModal />} />
-          <Route path="/notifications" element={<NotificationPage />} />
           <Route path="/category/:categoryName" element={<CategoryPage />} />
         </Route>
         <Route element={<ProtectedRoute />}>

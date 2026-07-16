@@ -3,6 +3,8 @@ import { Link, NavLink } from "react-router-dom";
 import { navLinks, utilityActions, logoConfig } from "../data";
 import SearchModal from "./SearchModal";
 import ProfileDropdown from "./ProfileDropdown";
+import { Bell } from "lucide-react";
+import NotificationDropdown from "./notifications/NotificationDropdown";
 
 const Topbar = ({ isAuthenticated, onLogout }) => {
   const [timeString, setTimeString] = useState(() => {
@@ -18,8 +20,9 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
   });
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
 
-  // Update live clock every second
   useEffect(() => {
     const updateTime = () => {
       setTimeString(
@@ -112,7 +115,55 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
               );
             }
 
-            // Default behavior for standard utility links (Notifications, Users, etc.)
+            if (action.id === "notifications") {
+              return (
+                <div key={action.id} className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setShowNotifications((prev) => !prev)}
+                    className="relative p-2
+rounded-full
+transition-all
+duration-200
+hover:scale-110
+hover:bg-slate-100
+active:scale-95"
+                  >
+                    <Bell size={action.size} />
+
+                    {notificationCount > 0 && (
+                      <span
+                        className="
+                absolute
+                -right-1
+                -top-1
+                flex
+                h-5
+                min-w-5
+                items-center
+                justify-center
+                rounded-full
+                bg-red-600
+                px-1
+                text-[10px]
+                font-bold
+                text-white
+            "
+                      >
+                        {notificationCount > 9 ? "9+" : notificationCount}
+                      </span>
+                    )}
+                  </button>
+
+                  <NotificationDropdown
+                    isOpen={showNotifications}
+                    onClose={() => setShowNotifications(false)}
+                    onCountChange={setNotificationCount}
+                  />
+                </div>
+              );
+            }
+
             if (action.to) {
               return (
                 <Link
