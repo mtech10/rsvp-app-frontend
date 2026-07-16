@@ -1,82 +1,155 @@
-import React, { useEffect, useMemo, useState } from "react";
-import EventDetailsLayout from "./EventDetailsLayout";
+import { useEffect, useMemo, useState } from "react";
+
 import EventCardItem from "./EventCardItem";
-import { useRSVP } from "../../context/RSVPContext";
+import EventDetailsLayout from "./EventDetailsLayout";
 
-const EventCards = ({ category = null, showAll = false }) => {
-  const { events = [] } = getEvents({
-    limit: showAll ? 100 : 12,
-    category,
-  });
+import { getEvents } from "../../services/eventService";
+import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
+
+export default function EventCards({ category = null, showAll = false }) {
+  const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
-  const { addRsvp } = useRSVP();
-
-  const selectedEvent = useMemo(
-    () => events.find((event) => event.api_id === selectedId) || null,
-    [events, selectedId],
-  );
-
-  const handleSelect = (id) => setSelectedId(id);
-  const handleRsvp = (registrationData) => {
-    if (registrationData) addRsvp(registrationData);
-  };
-  const handleClose = () => setSelectedId(null);
-
-  const handleNavigate = (direction) => {
-    const currentIndex = events.findIndex((e) => e.api_id === selectedId);
-    const nextIndex =
-      direction === "next" ? currentIndex + 1 : currentIndex - 1;
-
-    if (events[nextIndex]) {
-      setSelectedId(events[nextIndex].api_id);
-    }
-  };
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [myRSVP, setMyRSVP] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (selectedId) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
+    async function loadEvents() {
+      try {
+        const data = await getEvents();
+
+        let filtered = data.events || [];
+
+        if (category) {
+          filtered = filtered.filter(
+            (event) => event.category?.toLowerCase() === category.toLowerCase(),
+          );
+        }
+
+        if (!showAll) {
+          filtered = filtered.slice(0, 12);
+        }
+
+        setEvents(filtered);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
     }
+
+    loadEvents();
+  }, [category, showAll]);
+
+  useEffect(() => {
+    if (!selectedId) {
+      setSelectedEvent(null);
+      setMyRSVP(null);
+      return;
+    }
+
+    async function loadSelectedEvent() {
+      try {
+        const event = events.find((e) => e._id === selectedId);
+
+        setSelectedEvent(event);
+
+        try {
+          const rsvp = await getMyRSVP(selectedId);
+          setMyRSVP(rsvp.rsvp);
+        } catch {
+          setMyRSVP(null);
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadSelectedEvent();
+  }, [selectedId, events]);
+
+  useEffect(() => {
+    document.body.style.overflow = selectedId ? "hidden" : "auto";
 
     return () => {
       document.body.style.overflow = "auto";
     };
   }, [selectedId]);
 
+  const currentIndex = useMemo(
+    () => events.findIndex((e) => e._id === selectedId),
+    [events, selectedId],
+  );
+
+  const handleNavigate = (direction) => {
+    if (direction === "next" && currentIndex < events.length - 1) {
+      setSelectedId(events[currentIndex + 1]._id);
+    }
+
+    if (direction === "previous" && currentIndex > 0) {
+      setSelectedId(events[currentIndex - 1]._id);
+    }
+  };
+
+  const handleRsvp = async (tickets = 1) => {
+    try {
+      await createRSVP(selectedId, tickets);
+
+      const rsvp = await getMyRSVP(selectedId);
+
+      setMyRSVP(rsvp.rsvp);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  const handleCancel = async () => {
+    try {
+      await cancelRSVP(selectedId);
+
+      setMyRSVP(null);
+    } catch (error) {
+      alert(error.message);
+    }
+  };
+
+  if (loading) {
+    return <h2>Loading events...</h2>;
+  }
+
   return (
     <>
       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
         {events.map((event) => (
           <EventCardItem
-            key={event.api_id}
+            key={event._id}
             event={event}
-            selected={event.api_id === selectedId}
-            onClick={() => handleSelect(event.api_id)}
+            selected={event._id === selectedId}
+            onClick={() => setSelectedId(event._id)}
           />
         ))}
       </div>
 
       {selectedEvent && (
         <div
-          className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 px-4 py-2 backdrop-blur-sm sm:px-6 sm:py-3"
-          onClick={handleClose}
+          onClick={() => setSelectedId(null)}
+          className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-sm"
         >
           <div
-            className="relative flex h-full w-full max-w-2xl flex-col overflow-hidden rounded-xl bg-white shadow-2xl animate-in slide-in-from-right-8 fade-in transition-all"
             onClick={(e) => e.stopPropagation()}
+            className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl"
           >
-            <EventCardOpened
+            <EventDetailsLayout
               event={selectedEvent}
-              onNavigate={handleNavigate}
+              myRSVP={myRSVP}
               onRsvp={handleRsvp}
-              onClose={handleClose}
+              onCancel={handleCancel}
+              onClose={() => setSelectedId(null)}
+              onNavigate={handleNavigate}
             />
           </div>
         </div>
       )}
     </>
   );
-};
-
-export default EventCards;
+}

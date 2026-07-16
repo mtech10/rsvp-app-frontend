@@ -4,6 +4,7 @@ import { getEvent } from "../services/eventService";
 import { deleteEvent } from "../services/eventService";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getGuests, approveGuest, rejectGuest } from "../services/rsvpService";
+import { exportGuestsToCSV } from "../utility/exportGuests";
 
 export default function ManageEvent() {
   const { id } = useParams();
@@ -48,6 +49,10 @@ export default function ManageEvent() {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleExport = () => {
+    exportGuestsToCSV(event, guests);
   };
 
   useEffect(() => {
@@ -126,6 +131,7 @@ export default function ManageEvent() {
         pendingGuests,
         rejectedGuests,
       }}
+      onExport={handleExport}
     />
   );
 }

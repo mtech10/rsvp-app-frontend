@@ -33,5 +33,6 @@ export function deleteEvent(id) {
 }
 
 export function getEventById(id) {
+  console.log("===== getEventById HIT =====");
   return apiFetch(`/events/${id}`);
 }

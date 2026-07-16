@@ -11,6 +11,11 @@ import {
   Minus,
   Plus,
   X,
+  CalendarPlus,
+  Share2,
+  Ticket,
+  CheckCircle2,
+  Clock3,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { formatDateParts } from "../../utility/dateUtility";
@@ -39,6 +44,7 @@ const EventDetailsLayout = ({
   onNavigate,
   onCancel,
   mode = "public",
+  onExport,
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
@@ -224,38 +230,6 @@ const EventDetailsLayout = ({
             </div>
           )}
 
-          <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-            <h2 className="mb-5 text-lg font-semibold">Event Settings</h2>
-
-            <div className="space-y-4">
-              <div className="flex justify-between">
-                <span className="text-slate-500">Visibility</span>
-                <span className="font-medium capitalize">
-                  {event.visibility}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-slate-500">Ticket</span>
-                <span className="font-medium capitalize">
-                  {event.ticketType}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-slate-500">Capacity</span>
-                <span className="font-medium">
-                  {event.capacity || "Unlimited"}
-                </span>
-              </div>
-
-              <div className="flex justify-between">
-                <span className="text-slate-500">Timezone</span>
-                <span className="font-medium">{event.timezone}</span>
-              </div>
-            </div>
-          </div>
-
           {isOrganizer && (
             <>
               <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
@@ -358,6 +332,14 @@ const EventDetailsLayout = ({
                   ))
                 )}
               </div>
+              <div className="mb-5 flex justify-end">
+                <button
+                  onClick={onExport}
+                  className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-black"
+                >
+                  Export CSV
+                </button>
+              </div>
             </>
           )}
 
@@ -373,41 +355,54 @@ const EventDetailsLayout = ({
 
           <div className="mt-6 flex items-center justify-between gap-4">
             <p className="text-sm text-slate-500">
-              {event.rsvp_count || 0} people going
+              {event.goingCount || 0}{" "}
+              {(event.goingCount || 0) === 1 ? "person is" : "people are"} going
             </p>
           </div>
 
           {myRSVP ? (
             <div className="mt-12 rounded-2xl border border-slate-200 bg-slate-50 p-6">
-              <h4 className="text-3xl  text-slate-900">You're In</h4>
-              <p className="text-xl text-slate-500">Ticket: {event.title}</p>
-              <div className="flex gap-1">
-                <p className="text-md text-slate-900">
-                  No longer able to attend? Notify the host by
-                </p>
-                <span
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onCancel?.(event._id);
-                    onClose?.();
-                  }}
-                  className="text-rose-700 hover:border-b cursor-pointer"
-                >
-                  canceling your registration.
-                </span>
+              <div className="flex items-center gap-3">
+                {myRSVP?.status === "going" ? (
+                  <CheckCircle2 className="h-8 w-8 text-green-600" />
+                ) : (
+                  <Clock3 className="h-8 w-8 text-yellow-500" />
+                )}
+
+                <div>
+                  <h4 className="text-2xl font-semibold">
+                    {myRSVP?.status === "going"
+                      ? "You're Going"
+                      : "Request Pending"}
+                  </h4>
+
+                  <p className="text-sm text-slate-500">{event.title}</p>
+                </div>
               </div>
 
-              <div className="mt-4 flex items-center gap-3">
-                <div
-                  className={`px-4 py-1.5 rounded-full text-sm font-bold 
-            ${event.status === "going" ? "bg-emerald-100 text-emerald-700" : "bg-amber-100 text-amber-700"}`}
-                >
-                  {myRSVP.status === "going" ? "Going" : "Pending Approval"}
+              <div className="mt-6 space-y-3">
+                <div className="flex items-center gap-3">
+                  <Ticket className="h-5 w-5 text-slate-500" />
+                  <span>{myRSVP?.tickets || 1} Ticket(s)</span>
                 </div>
-                <p className="text-sm text-slate-600">
-                  {myRSVP.tickets || 1} ticket(s) booked
-                </p>
               </div>
+              <div className="mt-6 flex gap-3">
+                <button className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-slate-50">
+                  <CalendarPlus size={18} />
+                  Add to Calendar
+                </button>
+
+                <button className="flex items-center gap-2 rounded-lg border px-4 py-2 hover:bg-slate-50">
+                  <Share2 size={18} />
+                  Share
+                </button>
+              </div>
+              <button
+                onClick={() => onCancel?.(event._id)}
+                className="mt-6 text-sm font-medium border px-4 py-2 rounded-lg text-red-600 hover:text-red-700"
+              >
+                Cancel Registration
+              </button>
             </div>
           ) : (
             <div className="mt-12 rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -502,23 +497,6 @@ const EventDetailsLayout = ({
                   </p>
                 )}
               </div>
-            </div>
-          )}
-
-          {myRSVP?.status === "going" && (
-            <div className="mt-12 rounded-2xl border border-green-200 bg-green-50 p-6">
-              <h3 className="text-xl font-bold text-green-700">
-                ✅ You're Going
-              </h3>
-
-              <p className="mt-2 text-slate-700">Tickets: {myRSVP.tickets}</p>
-
-              <button
-                onClick={() => onCancel?.(event._id)}
-                className="mt-4 rounded-xl bg-red-600 px-4 py-2 text-white"
-              >
-                Cancel RSVP
-              </button>
             </div>
           )}
 

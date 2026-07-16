@@ -46,32 +46,28 @@ const EventCardItem = ({
         selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
       }`}
     >
-      <div className="relative  w-32 overflow-hidden  sm:w-32 shrink-0">
+      <div className="relative w-32 shrink-0 overflow-hidden">
         <img
           src={event.coverUrl || "https://placehold.co/600x400?text=Event"}
           alt={event.title}
-          className=" h-full w-full object-cover"
+          className="h-full w-full object-cover"
           loading="lazy"
         />
       </div>
-      <div className="flex flex-1 flex-col justify-between gap-3 p-4 sm:p-5">
+
+      <div className="flex flex-1 flex-col justify-between p-5">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
             {dateText}
           </p>
-          <h3 className="mt-2 text-base font-semibold text-slate-900 line-clamp-2">
+
+          <h3 className="mt-2 line-clamp-2 text-lg font-semibold text-slate-900">
             {event.title}
           </h3>
-          <p className="mt-1 text-sm leading-6 text-slate-600">{address}</p>
-          <p className="mt-1 text-sm font-semibold text-slate-900">
-            {event.rsvpCount || 0} attending
-          </p>
-        </div>
 
-        <div className="flex items-center justify-between text-xs text-slate-500">
-          {variant === "discover" && (
-            <span>{event.rsvpCount || 0} attending</span>
-          )}
+          <p className="mt-1 text-sm text-slate-600">{address}</p>
+
+          <p className="mt-1 text-sm font-medium text-slate-500">{city}</p>
         </div>
       </div>
     </button>
