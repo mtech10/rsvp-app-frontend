@@ -21,6 +21,16 @@ const EventDetailsLayout = ({
   event,
   myRSVP,
   guests = [],
+  stats = {
+    totalGuests: 0,
+    approvedGuests: 0,
+    pendingGuests: 0,
+    rejectedGuests: 0,
+  },
+  search,
+  setSearch,
+  statusFilter,
+  setStatusFilter,
   onApprove,
   onReject,
   onDelete,
@@ -247,63 +257,108 @@ const EventDetailsLayout = ({
           </div>
 
           {isOrganizer && (
-            <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-5 text-xl font-semibold">
-                Guests ({guests.length})
-              </h2>
-              {guests.length === 0 ? (
-                <p className="text-sm text-slate-500">No guests yet.</p>
-              ) : (
-                guests.map((guest) => (
-                  <div
-                    key={guest._id}
-                    className="flex items-center justify-between rounded-xl border p-4"
-                  >
-                    <div>
-                      <h4 className="font-semibold">{guest.user?.name}</h4>
+            <>
+              <div className="mb-8 grid grid-cols-2 gap-4 md:grid-cols-4">
+                <div className="rounded-xl bg-slate-100 p-4">
+                  <p className="text-sm text-slate-500">Total</p>
+                  <h2 className="text-2xl font-bold">{stats.totalGuests}</h2>
+                </div>
 
-                      <p className="text-sm text-slate-500">
-                        {guest.user?.email}
-                      </p>
+                <div className="rounded-xl bg-green-100 p-4">
+                  <p className="text-sm text-green-700">Approved</p>
+                  <h2 className="text-2xl font-bold">{stats.approvedGuests}</h2>
+                </div>
+
+                <div className="rounded-xl bg-yellow-100 p-4">
+                  <p className="text-sm text-yellow-700">Pending</p>
+                  <h2 className="text-2xl font-bold">{stats.pendingGuests}</h2>
+                </div>
+
+                <div className="rounded-xl bg-red-100 p-4">
+                  <p className="text-sm text-red-700">Rejected</p>
+                  <h2 className="text-2xl font-bold">{stats.rejectedGuests}</h2>
+                </div>
+              </div>
+
+              <div className="mb-6 flex flex-col gap-4 md:flex-row">
+                <input
+                  type="text"
+                  placeholder="Search guests..."
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="flex-1 rounded-xl border border-slate-300 px-4 py-2"
+                />
+
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="rounded-xl border border-slate-300 px-4 py-2"
+                >
+                  <option value="all">All</option>
+                  <option value="going">Approved</option>
+                  <option value="pending">Pending</option>
+                  <option value="rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+                <h2 className="mb-5 text-xl font-semibold">
+                  Guests ({guests.length})
+                </h2>
+                {guests.length === 0 ? (
+                  <p className="text-sm text-slate-500">No guests yet.</p>
+                ) : (
+                  guests.map((guest) => (
+                    <div
+                      key={guest._id}
+                      className="flex items-center justify-between rounded-xl border p-4"
+                    >
+                      <div>
+                        <h4 className="font-semibold">{guest.user?.name}</h4>
+
+                        <p className="text-sm text-slate-500">
+                          {guest.user?.email}
+                        </p>
+                      </div>
+
+                      <div className="text-right">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold ${
+                            guest.status === "going"
+                              ? "bg-green-100 text-green-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                        >
+                          {guest.status}
+                        </span>
+
+                        {guest.status === "pending" && (
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              onClick={() => onApprove(guest._id)}
+                              className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
+                            >
+                              Approve
+                            </button>
+
+                            <button
+                              onClick={() => onReject(guest._id)}
+                              className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
+                            >
+                              Reject
+                            </button>
+                          </div>
+                        )}
+
+                        <p className="mt-1 text-xs text-slate-500">
+                          {guest.tickets} ticket(s)
+                        </p>
+                      </div>
                     </div>
-
-                    <div className="text-right">
-                      <span
-                        className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                          guest.status === "going"
-                            ? "bg-green-100 text-green-700"
-                            : "bg-yellow-100 text-yellow-700"
-                        }`}
-                      >
-                        {guest.status}
-                      </span>
-
-                      {guest.status === "pending" && (
-                        <div className="mt-3 flex gap-2">
-                          <button
-                            onClick={() => onApprove(guest._id)}
-                            className="rounded-lg bg-green-600 px-3 py-1 text-xs font-semibold text-white hover:bg-green-700"
-                          >
-                            Approve
-                          </button>
-
-                          <button
-                            onClick={() => onReject(guest._id)}
-                            className="rounded-lg bg-red-600 px-3 py-1 text-xs font-semibold text-white hover:bg-red-700"
-                          >
-                            Reject
-                          </button>
-                        </div>
-                      )}
-
-                      <p className="mt-1 text-xs text-slate-500">
-                        {guest.tickets} ticket(s)
-                      </p>
-                    </div>
-                  </div>
-                ))
-              )}
-            </div>
+                  ))
+                )}
+              </div>
+            </>
           )}
 
           {isOrganizer && (

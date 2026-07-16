@@ -13,6 +13,33 @@ export default function ManageEvent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [guests, setGuests] = useState([]);
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
+
+  const totalGuests = guests.length;
+
+  const pendingGuests = guests.filter(
+    (guest) => guest.status === "pending",
+  ).length;
+
+  const approvedGuests = guests.filter(
+    (guest) => guest.status === "going",
+  ).length;
+
+  const rejectedGuests = guests.filter(
+    (guest) => guest.status === "rejected",
+  ).length;
+
+  const filteredGuests = guests.filter((guest) => {
+    const matchesSearch =
+      guest.user.name.toLowerCase().includes(search.toLowerCase()) ||
+      guest.user.email.toLowerCase().includes(search.toLowerCase());
+
+    const matchesStatus =
+      statusFilter === "all" || guest.status === statusFilter;
+
+    return matchesSearch && matchesStatus;
+  });
 
   const refreshGuests = async () => {
     try {
@@ -83,12 +110,22 @@ export default function ManageEvent() {
   return (
     <EventDetailsLayout
       event={event}
-      guests={guests}
+      guests={filteredGuests}
+      search={search}
+      setSearch={setSearch}
+      statusFilter={statusFilter}
+      setStatusFilter={setStatusFilter}
       mode="organizer"
       onDelete={handleDelete}
-      onClose={() => navigate("/my-events")}
       onApprove={handleApprove}
       onReject={handleReject}
+      onClose={() => navigate("/my-events")}
+      stats={{
+        totalGuests,
+        approvedGuests,
+        pendingGuests,
+        rejectedGuests,
+      }}
     />
   );
 }
