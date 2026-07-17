@@ -14,10 +14,12 @@ export function login(credentials) {
   });
 }
 
-export function getCurrentUser(token) {
-  return apiFetch("/auth/me", {
+export async function getCurrentUser(token) {
+  const data = await apiFetch("/auth/me", {
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
+
+  return data.user;
 }

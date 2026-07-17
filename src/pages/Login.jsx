@@ -25,7 +25,7 @@ export default function Login() {
         password,
       });
 
-      const { user } = await getCurrentUser(token);
+      const user = await getCurrentUser(token);
       login(user, token);
 
       navigate("/");
