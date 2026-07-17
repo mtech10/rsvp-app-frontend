@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { navLinks, utilityActions, logoConfig } from "../data";
 import SearchModal from "./SearchModal";
-import ProfileDropdown from "./ProfileDropdown";
+import NotificationBell from "./notifications/NotificationBell";
+import ProfileMenu from "./ProfileMenu";
+import { useAuth } from "../context/AuthContext";
 import { Bell } from "lucide-react";
-import NotificationDropdown from "./notifications/NotificationDropdown";
 
-const Topbar = ({ isAuthenticated, onLogout }) => {
+const Topbar = () => {
   const [timeString, setTimeString] = useState(() => {
     if (typeof window !== "undefined") {
       return new Date().toLocaleTimeString("en-US", {
@@ -20,8 +21,7 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
   });
 
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const { user, logout } = useAuth();
 
   useEffect(() => {
     const updateTime = () => {
@@ -39,7 +39,6 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Global Keyboard Shortcut (Cmd+K / Ctrl+K) to open search
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -47,7 +46,9 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
         setIsSearchOpen(true);
       }
     };
+
     window.addEventListener("keydown", handleKeyDown);
+
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, []);
 
@@ -55,144 +56,70 @@ const Topbar = ({ isAuthenticated, onLogout }) => {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex p-4 items-center justify-between bg-white/80 backdrop-blur border-b border-slate-100">
+      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-100 bg-white/80 p-4 backdrop-blur">
         <Link
           to="/"
-          className="text-slate-500 hover:text-slate-900 transition-colors"
+          className="text-slate-500 transition-colors hover:text-slate-900"
         >
           <LogoIcon size={20} />
         </Link>
 
-        {/* Navigation Links */}
-        <div className="flex gap-6 items-center text-slate-500">
+        {/* Navigation */}
+        <div className="flex items-center gap-6 text-slate-500">
           {navLinks.map((link) => {
             const IconComponent = link.icon;
+
             return (
               <NavLink
                 key={link.id}
                 to={link.to}
                 className={({ isActive }) =>
                   `flex items-center gap-2 transition-colors hover:text-slate-600 ${
-                    isActive ? "text-slate-600 font-semibold" : "text-slate-400"
+                    isActive ? "font-semibold text-slate-600" : "text-slate-400"
                   }`
                 }
               >
-                <IconComponent size={18} className="shrink-0" />
-                <span className="leading-none">{link.name}</span>
+                <IconComponent size={18} />
+                <span>{link.name}</span>
               </NavLink>
             );
           })}
         </div>
 
-        {/* Right Utility Section */}
-        <div className="flex gap-4 items-center text-slate-500">
-          <span className="text-sm font-medium mr-2">{timeString}</span>
+        {/* Right Section */}
+        <div className="flex items-center gap-4 text-slate-500">
+          <span className="mr-2 text-sm font-medium">{timeString}</span>
+
           <Link
             to="/create"
-            className="hover:text-slate-900 font-medium text-sm transition-colors"
+            className="text-sm font-medium transition-colors hover:text-slate-900"
           >
             Create Event
           </Link>
 
           {utilityActions.map((action) => {
-            const ActionIcon = action.icon;
-
-            // INTERCEPT SEARCH: Open Modal instead of navigating
-            if (action.id === "profile" && isAuthenticated) {
-              return null;
-            }
-            if (action.id === "search") {
-              return (
-                <button
-                  key={action.id}
-                  type="button"
-                  onClick={() => setIsSearchOpen(true)}
-                  title={`${action.name} (Cmd+K)`}
-                  className="hover:text-slate-900 transition-colors p-1 rounded-full hover:bg-slate-50 cursor-pointer"
-                >
-                  <ActionIcon size={action.size} />
-                </button>
-              );
-            }
-
-            if (action.id === "notifications") {
-              return (
-                <div key={action.id} className="relative">
-                  <button
-                    type="button"
-                    onClick={() => setShowNotifications((prev) => !prev)}
-                    className="relative p-2
-rounded-full
-transition-all
-duration-200
-hover:scale-110
-hover:bg-slate-100
-active:scale-95"
-                  >
-                    <Bell size={action.size} />
-
-                    {notificationCount > 0 && (
-                      <span
-                        className="
-                absolute
-                -right-1
-                -top-1
-                flex
-                h-5
-                min-w-5
-                items-center
-                justify-center
-                rounded-full
-                bg-red-600
-                px-1
-                text-[10px]
-                font-bold
-                text-white
-            "
-                      >
-                        {notificationCount > 9 ? "9+" : notificationCount}
-                      </span>
-                    )}
-                  </button>
-
-                  <NotificationDropdown
-                    isOpen={showNotifications}
-                    onClose={() => setShowNotifications(false)}
-                    onCountChange={setNotificationCount}
-                  />
-                </div>
-              );
-            }
-
-            if (action.to) {
-              return (
-                <Link
-                  key={action.id}
-                  to={action.to}
-                  title={action.name}
-                  className="hover:text-slate-900 transition-colors p-1 rounded-full hover:bg-slate-50"
-                >
-                  <ActionIcon size={action.size} />
-                </Link>
-              );
-            }
+            const Icon = action.icon;
 
             return (
               <button
                 key={action.id}
-                type="button"
-                title={action.name}
-                className="hover:text-slate-900 transition-colors p-1 rounded-full hover:bg-slate-50 cursor-pointer"
+                onClick={() => setIsSearchOpen(true)}
+                className="rounded-full p-2 transition hover:bg-slate-100"
               >
-                <ActionIcon size={action.size} />
+                <Icon size={action.size} />
               </button>
             );
           })}
-          {isAuthenticated && <ProfileDropdown onLogout={onLogout} />}
+
+          {user && (
+            <>
+              <NotificationBell />
+              <ProfileMenu onLogout={logout} />
+            </>
+          )}
         </div>
       </div>
 
-      {/* Render the Global Search Modal */}
       <SearchModal
         isOpen={isSearchOpen}
         onClose={() => setIsSearchOpen(false)}

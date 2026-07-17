@@ -18,6 +18,7 @@ import MyEvents from "./pages/MyEvents";
 import ManageEvent from "./pages/ManageEvent";
 import EditEvent from "./pages/EditEvent";
 import EventDetails from "./pages/EventDetails";
+import Profile from "./pages/Profile";
 
 export default function App() {
   return (
@@ -40,6 +41,7 @@ export default function App() {
             <Route path="/my-events" element={<MyEvents />} />
             <Route path="/my-events/:id" element={<ManageEvent />} />
             <Route path="/my-events/:id/edit" element={<EditEvent />} />
+            <Route path="/profile" element={<Profile />} />
           </Route>
         </Route>
       </Routes>
