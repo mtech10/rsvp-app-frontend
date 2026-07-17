@@ -130,6 +130,7 @@ const EventDetailsLayout = ({
             </button>
           </div>
         </div>
+
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20 pt-8 sm:px-12">
           <div className="relative flex justify-center">
             <img
