@@ -1,7 +1,8 @@
 import { Users, UserCheck, Clock3, UserX } from "lucide-react";
+import StatsGrid from "../ui/StatsGrid";
 
 export default function GuestStats({ stats }) {
-  const cards = [
+  const guestcards = [
     {
       label: "Total Guests",
       value: stats.totalGuests,
@@ -32,32 +33,5 @@ export default function GuestStats({ stats }) {
     },
   ];
 
-  return (
-    <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-4">
-      {cards.map((card) => {
-        const Icon = card.icon;
-
-        return (
-          <div
-            key={card.label}
-            className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm transition hover:shadow-md"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-slate-500">{card.label}</p>
-
-                <h3 className="mt-2 text-3xl font-bold text-slate-900">
-                  {card.value}
-                </h3>
-              </div>
-
-              <div className={`rounded-xl p-3 ${card.bg}`}>
-                <Icon size={22} className={card.color} />
-              </div>
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
+  return <StatsGrid cards={guestcards} />;
 }

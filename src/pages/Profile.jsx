@@ -1,13 +1,19 @@
-export default function Profile() {
-  return (
-    <div className="mx-auto max-w-5xl">
-      <div className="rounded-3xl border border-slate-200 bg-white p-10 shadow-sm">
-        <h1 className="text-3xl font-bold text-slate-900">My Profile</h1>
+import { useAuth } from "../context/AuthContext";
 
-        <p className="mt-3 text-slate-500">
-          Manage your personal information and account settings.
-        </p>
-      </div>
+import ProfileHeader from "../components/profile/ProfileHeader";
+import ProfileStats from "../components/profile/ProfileStats";
+import ProfileQuickActions from "../components/profile/ProfileQuickActions";
+
+export default function Profile() {
+  const { user } = useAuth();
+
+  return (
+    <div className="mx-auto max-w-5xl space-y-8">
+      <ProfileHeader user={user} />
+
+      <ProfileStats hosted={0} joined={0} going={0} pending={0} />
+
+      <ProfileQuickActions />
     </div>
   );
 }
