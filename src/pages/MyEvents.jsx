@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { getMyEvents } from "../services/eventService";
 import { useNavigate } from "react-router-dom";
 import EventCardItem from "../components/events/EventCardItem";
+import EmptyState from "../components/ui/EmptyState";
+import { CalendarPlus } from "lucide-react";
 
 export default function MyEvents() {
   const navigate = useNavigate();
@@ -47,20 +49,19 @@ export default function MyEvents() {
       </div>
 
       {events.length === 0 ? (
-        <div className="rounded-2xl border border-dashed p-12 text-center">
-          <h2 className="text-xl font-semibold">No events yet</h2>
-
-          <p className="mt-3 text-slate-500">
-            Create your first event to start inviting people.
-          </p>
-
-          <button
-            onClick={() => navigate("/create")}
-            className="mt-6 rounded-lg bg-black px-5 py-3 text-white"
-          >
-            Create Event
-          </button>
-        </div>
+        <EmptyState
+          icon={CalendarPlus}
+          title="No events yet"
+          description="Create your first event to start inviting people."
+          action={
+            <button
+              onClick={() => navigate("/create")}
+              className="rounded-lg bg-black px-5 py-3 text-white transition hover:bg-slate-800"
+            >
+              Create Event
+            </button>
+          }
+        />
       ) : (
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
           {events.map((event) => (
