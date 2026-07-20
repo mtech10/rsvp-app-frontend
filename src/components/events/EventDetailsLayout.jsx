@@ -25,11 +25,13 @@ import OrganizerPanel from "./OrganizerPanel";
 import GuestStats from "./GuestStats";
 import RegistrationCard from "./RegistrationCard";
 import UserProfileInfo from "./UserProfileInfo";
+import GuestTable from "./GuestTable";
 
 const EventDetailsLayout = ({
   event,
   myRSVP,
   guests = [],
+  guest,
   stats = {
     totalGuests: 0,
     approvedGuests: 0,
@@ -207,6 +209,14 @@ const EventDetailsLayout = ({
                 Event insights and attendance analytics are coming soon.
               </p>
             </div>
+          )}
+
+          {isOrganizer && (
+            <GuestTable
+              guests={guests}
+              onApprove={onApprove}
+              onReject={onReject}
+            />
           )}
 
           <div className="mt-6 flex items-center justify-between gap-4">

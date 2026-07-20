@@ -108,6 +108,7 @@ export default function ManageEvent() {
       alert(err.message);
     }
   };
+
   if (loading) return <h2>Loading...</h2>;
 
   if (error) return <h2>{error}</h2>;

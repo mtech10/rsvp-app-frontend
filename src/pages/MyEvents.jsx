@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import EventCardItem from "../components/events/EventCardItem";
 import EmptyState from "../components/ui/EmptyState";
 import { CalendarPlus } from "lucide-react";
+import SectionHeader from "../components/ui/SectionHeader";
 
 export default function MyEvents() {
   const navigate = useNavigate();
@@ -32,20 +33,18 @@ export default function MyEvents() {
   return (
     <div className="mx-auto max-w-5xl">
       <div className="mb-10 flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">My Events</h1>
-
-          <p className="mt-2 text-slate-500">
-            Manage the events you've created.
-          </p>
-        </div>
-
-        <button
-          onClick={() => navigate("/create")}
-          className="rounded-lg bg-black px-5 py-3 text-white hover:bg-slate-800"
-        >
-          + Create Event
-        </button>
+        <SectionHeader
+          title="My Events"
+          description="Manage the events you've created."
+          action={
+            <button
+              onClick={() => navigate("/create")}
+              className="rounded-xl bg-slate-900 px-5 py-3 text-white transition hover:bg-slate-800"
+            >
+              Create Event
+            </button>
+          }
+        />
       </div>
 
       {events.length === 0 ? (
