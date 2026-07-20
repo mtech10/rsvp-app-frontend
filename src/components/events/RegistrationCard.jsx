@@ -2,10 +2,12 @@ import { UserCheck, Hash, Minus, Plus } from "lucide-react";
 
 export default function RegistrationCard({
   event,
+  rsvp,
   ticketCount,
   onIncrement,
   onDecrement,
   onRegister,
+  onCancel,
   loading,
   UserProfileInfo,
   setShowApprovalForm,
