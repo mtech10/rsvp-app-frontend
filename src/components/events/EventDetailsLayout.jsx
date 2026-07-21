@@ -19,6 +19,8 @@ import GuestStats from "./GuestStats";
 import UserProfileInfo from "./UserProfileInfo";
 import GuestTable from "./GuestTable";
 import RegistrationSection from "./RegistrationSection";
+import { getEventAnalytics } from "../../services/eventService";
+import AnalyticsPanel from "./AnalyticsPanel";
 
 const EventDetailsLayout = ({
   event,
@@ -48,6 +50,22 @@ const EventDetailsLayout = ({
   const [ticketCount, setTicketCount] = useState(1);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [analytics, setAnalytics] = useState(null);
+
+  useEffect(() => {
+    if (mode !== "organizer") return;
+
+    async function loadAnalytics() {
+      try {
+        const { analytics } = await getEventAnalytics(event._id);
+        setAnalytics(analytics);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
+    loadAnalytics();
+  }, [event._id, mode]);
 
   if (!event) return null;
 
@@ -189,15 +207,7 @@ const EventDetailsLayout = ({
 
           {isOrganizer && <GuestStats stats={stats} />}
 
-          {isOrganizer && (
-            <div className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-              <h2 className="mb-3 text-lg font-semibold">Analytics</h2>
-
-              <p className="text-slate-500">
-                Event insights and attendance analytics are coming soon.
-              </p>
-            </div>
-          )}
+          {isOrganizer && <AnalyticsPanel analytics={analytics} />}
 
           {isOrganizer && (
             <GuestTable

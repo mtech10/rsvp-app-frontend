@@ -36,3 +36,7 @@ export function getEventById(id) {
   console.log("===== getEventById HIT =====");
   return apiFetch(`/events/${id}`);
 }
+
+export async function getEventAnalytics(eventId) {
+  return apiFetch(`/events/${eventId}/analytics`);
+}
