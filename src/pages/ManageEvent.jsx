@@ -16,6 +16,7 @@ export default function ManageEvent() {
   const [guests, setGuests] = useState([]);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [guestFilter, setGuestFilter] = useState("all");
 
   const totalGuests = guests.length;
 
@@ -39,7 +40,10 @@ export default function ManageEvent() {
     const matchesStatus =
       statusFilter === "all" || guest.status === statusFilter;
 
-    return matchesSearch && matchesStatus;
+    const matchesAnalytics =
+      guestFilter === "all" || guest.status === guestFilter;
+
+    return matchesSearch && matchesStatus && matchesAnalytics;
   });
 
   const refreshGuests = async () => {
@@ -52,7 +56,7 @@ export default function ManageEvent() {
   };
 
   const handleExport = () => {
-    exportGuestsToCSV(event, guests);
+    exportGuestsToCSV(event, filteredGuests);
   };
 
   useEffect(() => {
@@ -133,6 +137,8 @@ export default function ManageEvent() {
         rejectedGuests,
       }}
       onExport={handleExport}
+      guestFilter={guestFilter}
+      setGuestFilter={setGuestFilter}
     />
   );
 }

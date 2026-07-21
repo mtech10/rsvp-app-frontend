@@ -13,8 +13,12 @@ export default function GuestTable({ guests, onApprove, onReject }) {
       </div>
 
       {guests.length === 0 ? (
-        <div className="p-10 text-center text-slate-500">
-          No guests have registered yet.
+        <div className="p-10 text-center">
+          <p className="font-medium text-slate-700">No guests found.</p>
+
+          <p className="mt-2 text-sm text-slate-500">
+            Try adjusting your search or filters.
+          </p>
         </div>
       ) : (
         <div className="overflow-x-auto">

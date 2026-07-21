@@ -2,7 +2,11 @@ import { Users, CheckCircle2, Clock3, XCircle, BarChart3 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 import RecentActivity from "./RecentActivity";
 
-export default function AnalyticsPanel({ analytics }) {
+export default function AnalyticsPanel({
+  analytics,
+  selectedFilter,
+  onSelectFilter,
+}) {
   if (!analytics) return null;
 
   const cards = [
@@ -14,6 +18,7 @@ export default function AnalyticsPanel({ analytics }) {
       bg: "bg-slate-50",
       border: "border-slate-200",
       iconColor: "text-slate-700",
+      filter: "all",
     },
     {
       title: "Going",
@@ -23,6 +28,7 @@ export default function AnalyticsPanel({ analytics }) {
       bg: "bg-green-50",
       border: "border-green-200",
       iconColor: "text-green-600",
+      filter: "going",
     },
     {
       title: "Pending",
@@ -32,6 +38,7 @@ export default function AnalyticsPanel({ analytics }) {
       bg: "bg-amber-50",
       border: "border-amber-200",
       iconColor: "text-amber-600",
+      filter: "pending",
     },
     {
       title: "Cancelled",
@@ -41,6 +48,7 @@ export default function AnalyticsPanel({ analytics }) {
       bg: "bg-red-50",
       border: "border-red-200",
       iconColor: "text-red-600",
+      filter: "cancelled",
     },
   ];
 
@@ -67,11 +75,21 @@ export default function AnalyticsPanel({ analytics }) {
           return (
             <div
               key={card.title}
-              className={`${card.bg} ${card.border}
-              rounded-2xl border p-6
-              transition-all duration-300
-              hover:-translate-y-1
-              hover:shadow-lg`}
+              onClick={() => onSelectFilter(card.filter)}
+              className={`
+    ${card.bg}
+    ${card.border}
+    rounded-2xl
+    border
+    p-6
+    cursor-pointer
+    transition-all
+    duration-300
+    hover:-translate-y-1
+    hover:shadow-lg
+
+    ${selectedFilter === card.filter ? "ring-2 ring-slate-900 shadow-lg" : ""}
+  `}
             >
               <div className="mb-5 flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-600">

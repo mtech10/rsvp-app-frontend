@@ -46,6 +46,8 @@ const EventDetailsLayout = ({
   onCancel,
   mode = "public",
   onExport,
+  guestFilter,
+  setGuestFilter,
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
@@ -203,15 +205,28 @@ const EventDetailsLayout = ({
             </p>
           </div>
 
-          {isOrganizer && <OrganizerPanel event={event} onDelete={onDelete} />}
+          {isOrganizer && (
+            <OrganizerPanel
+              event={event}
+              onDelete={onDelete}
+              onExport={onExport}
+            />
+          )}
 
           {isOrganizer && <GuestStats stats={stats} />}
 
-          {isOrganizer && <AnalyticsPanel analytics={analytics} />}
+          {isOrganizer && (
+            <AnalyticsPanel
+              analytics={analytics}
+              selectedFilter={guestFilter}
+              onSelectFilter={setGuestFilter}
+            />
+          )}
 
           {isOrganizer && (
             <GuestTable
               guests={guests}
+              filter={guestFilter}
               onApprove={onApprove}
               onReject={onReject}
             />

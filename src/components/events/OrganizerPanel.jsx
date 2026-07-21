@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
-import { Pencil, Trash2 } from "lucide-react";
+import { Download, Pencil, Trash2 } from "lucide-react";
 
-export default function OrganizerPanel({ event, onDelete }) {
+export default function OrganizerPanel({ event, onDelete, onExport }) {
   const navigate = useNavigate();
 
   return (
@@ -37,6 +37,14 @@ export default function OrganizerPanel({ event, onDelete }) {
               Permanently remove this event and all associated RSVPs.
             </p>
           </div>
+        </button>
+
+        <button
+          onClick={onExport}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
+        >
+          <Download size={18} />
+          Export Guests
         </button>
       </div>
     </div>
