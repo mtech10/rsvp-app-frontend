@@ -1,13 +1,5 @@
-import {
-  User,
-  Mail,
-  Ticket,
-  CheckCircle2,
-  Clock3,
-  XCircle,
-  Check,
-  X,
-} from "lucide-react";
+import { User, Mail, Ticket, Check, X } from "lucide-react";
+import StatusBadge from "./StatusBadge";
 
 export default function GuestTable({ guests, onApprove, onReject }) {
   return (
@@ -87,26 +79,7 @@ export default function GuestTable({ guests, onApprove, onReject }) {
                   </td>
 
                   <td className="px-6 py-4">
-                    {guest.status === "going" && (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-green-100 px-3 py-1 text-sm font-medium text-green-700">
-                        <CheckCircle2 size={15} />
-                        Going
-                      </span>
-                    )}
-
-                    {guest.status === "pending" && (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-amber-100 px-3 py-1 text-sm font-medium text-amber-700">
-                        <Clock3 size={15} />
-                        Pending
-                      </span>
-                    )}
-
-                    {guest.status === "rejected" && (
-                      <span className="inline-flex items-center gap-2 rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-700">
-                        <XCircle size={15} />
-                        Rejected
-                      </span>
-                    )}
+                    <StatusBadge status={guest.status} />
                   </td>
 
                   <td className="px-6 py-4">

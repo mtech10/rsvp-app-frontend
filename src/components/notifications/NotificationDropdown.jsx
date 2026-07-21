@@ -173,7 +173,16 @@ export default function NotificationDropdown({
                   await handleRead(notification._id);
 
                   if (notification.event?._id) {
-                    navigate(`/events/${notification.event._id}`);
+                    const organizerNotifications = [
+                      "rsvp_request",
+                      "rsvp_cancelled",
+                    ];
+
+                    if (organizerNotifications.includes(notification.type)) {
+                      navigate(`/my-events/${notification.event._id}`);
+                    } else {
+                      navigate(`/events/${notification.event._id}`);
+                    }
                   }
 
                   onClose?.();
