@@ -34,6 +34,7 @@ import ConnectMeetingModal from "../ConnectMeetingModal";
 import { createEvent, updateEvent } from "../../services/eventService";
 import { useNavigate } from "react-router-dom";
 import Popover from "../Popover";
+import toast from "react-hot-toast";
 
 const THEMES = ["Minimal", "Vibrant", "Elegant", "Bold"];
 
@@ -244,37 +245,34 @@ const EventForm = ({ mode = "create", event = null }) => {
         description,
         coverUrl: imageUrl,
         theme,
-
         startAt,
         endAt,
-
         timezone: timezone.id,
-
         locationType: location ? "in_person" : "online",
-
         venue: location?.name,
-
         address: location?.address,
-
         city: location?.address ? getCityFromLabel(location.address) : "",
-
         visibility,
-
         ticketType: ticket.isPaid ? "paid" : "free",
-
         price: ticket.isPaid ? Number(ticket.price) : 0,
-
         capacity,
-
         requireApproval,
       };
+
       if (mode === "create") {
         await createEvent(eventData);
+        toast.success("Event created successfully.");
       } else {
         await updateEvent(event._id, eventData);
+        toast.success("Event updated successfully.");
       }
 
-      navigate("/my-events");
+      const updatedEvent = await updateEvent(event._id, eventData);
+
+      navigate(`/my-events/${updatedEvent.event._id}`);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.message);
     } finally {
       setSubmitting(false);
     }

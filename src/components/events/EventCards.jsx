@@ -6,6 +6,8 @@ import EventDetailsLayout from "./EventDetailsLayout";
 import { getEvents } from "../../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 
+import toast from "react-hot-toast";
+
 export default function EventCards({ category = null, showAll = false }) {
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -99,7 +101,7 @@ export default function EventCards({ category = null, showAll = false }) {
 
       setMyRSVP(rsvp.rsvp);
     } catch (error) {
-      alert(error.message);
+      toast.error(err.message);
     }
   };
 
@@ -109,7 +111,7 @@ export default function EventCards({ category = null, showAll = false }) {
 
       setMyRSVP(null);
     } catch (error) {
-      alert(error.message);
+      toast.error(err.message);
     }
   };
 

@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getEvent } from "../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
+import toast from "react-hot-toast";
 
 export default function EventDetails() {
   const { id } = useParams();
@@ -44,7 +45,7 @@ export default function EventDetails() {
       setEvent(eventData.event);
       setMyRSVP(rsvpData.rsvp);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   }
 
@@ -57,7 +58,7 @@ export default function EventDetails() {
       setEvent(eventData.event);
       setMyRSVP(null);
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   }
 

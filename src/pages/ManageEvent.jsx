@@ -5,6 +5,8 @@ import { deleteEvent } from "../services/eventService";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getGuests, approveGuest, rejectGuest } from "../services/rsvpService";
 import { exportGuestsToCSV } from "../utility/exportGuests";
+import toast from "react-hot-toast";
+import ConfirmationModal from "../components/ui/ConfirmationModal";
 
 export default function ManageEvent() {
   const { id } = useParams();
@@ -17,6 +19,7 @@ export default function ManageEvent() {
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
   const [guestFilter, setGuestFilter] = useState("all");
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   const totalGuests = guests.length;
 
@@ -77,21 +80,15 @@ export default function ManageEvent() {
   }, [id]);
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete this event?",
-    );
-
-    if (!confirmed) return;
-
     try {
       await deleteEvent(event._id);
 
-      alert("Event deleted successfully.");
+      toast.success("Event deleted successfully.");
 
       navigate("/my-events");
     } catch (err) {
       console.error(err);
-      alert("Failed to delete event.");
+      toast.error("Failed to delete event.");
     }
   };
 
@@ -100,7 +97,7 @@ export default function ManageEvent() {
       await approveGuest(rsvpId);
       await refreshGuests();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -109,7 +106,7 @@ export default function ManageEvent() {
       await rejectGuest(rsvpId);
       await refreshGuests();
     } catch (err) {
-      alert(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -118,27 +115,40 @@ export default function ManageEvent() {
   if (error) return <h2>{error}</h2>;
 
   return (
-    <EventDetailsLayout
-      event={event}
-      guests={filteredGuests}
-      search={search}
-      setSearch={setSearch}
-      statusFilter={statusFilter}
-      setStatusFilter={setStatusFilter}
-      mode="organizer"
-      onDelete={handleDelete}
-      onApprove={handleApprove}
-      onReject={handleReject}
-      onClose={() => navigate("/my-events")}
-      stats={{
-        totalGuests,
-        approvedGuests,
-        pendingGuests,
-        rejectedGuests,
-      }}
-      onExport={handleExport}
-      guestFilter={guestFilter}
-      setGuestFilter={setGuestFilter}
-    />
+    <>
+      <EventDetailsLayout
+        event={event}
+        guests={filteredGuests}
+        search={search}
+        setSearch={setSearch}
+        statusFilter={statusFilter}
+        setStatusFilter={setStatusFilter}
+        mode="organizer"
+        onDelete={() => setShowDeleteModal(true)}
+        onApprove={handleApprove}
+        onReject={handleReject}
+        onClose={() => navigate("/my-events")}
+        stats={{
+          totalGuests,
+          approvedGuests,
+          pendingGuests,
+          rejectedGuests,
+        }}
+        onExport={handleExport}
+        guestFilter={guestFilter}
+        setGuestFilter={setGuestFilter}
+      />
+      <ConfirmationModal
+        open={showDeleteModal}
+        title="Delete Event?"
+        message="This action cannot be undone."
+        confirmText="Delete Event"
+        onCancel={() => setShowDeleteModal(false)}
+        onConfirm={async () => {
+          setShowDeleteModal(false);
+          await handleDelete();
+        }}
+      />
+    </>
   );
 }
