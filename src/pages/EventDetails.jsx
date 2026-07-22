@@ -6,6 +6,7 @@ import { getEvent } from "../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
 import toast from "react-hot-toast";
 
+import EventDetailsSkeleton from "../components/skeletons/EventDetailsSkeleton";
 export default function EventDetails() {
   const { id } = useParams();
 
@@ -44,8 +45,14 @@ export default function EventDetails() {
 
       setEvent(eventData.event);
       setMyRSVP(rsvpData.rsvp);
+      toast.success(
+        eventData.event.requireApproval
+          ? "Registration request submitted successfully."
+          : "RSVP confirmed successfully.",
+      );
     } catch (err) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(err.message || "Failed to submit RSVP.");
     }
   }
 
@@ -57,12 +64,16 @@ export default function EventDetails() {
 
       setEvent(eventData.event);
       setMyRSVP(null);
+      toast.success("Registration cancelled successfully.");
     } catch (err) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(err.message || "Failed to cancel registration.");
     }
   }
 
-  if (loading) return <h2>Loading...</h2>;
+  if (loading) {
+    return <EventDetailsSkeleton />;
+  }
 
   return (
     <EventDetailsLayout

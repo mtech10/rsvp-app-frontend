@@ -53,21 +53,34 @@ const EventDetailsLayout = ({
   const [showApprovalForm, setShowApprovalForm] = useState(false);
   const [loading, setLoading] = useState(false);
   const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(
+    mode === "organizer",
+  );
 
   useEffect(() => {
-    if (mode !== "organizer") return;
+    if (mode !== "organizer" || !event?._id) return;
+
+    let isActive = true;
 
     async function loadAnalytics() {
+      setAnalyticsLoading(true);
+
       try {
         const { analytics } = await getEventAnalytics(event._id);
-        setAnalytics(analytics);
+        if (isActive) setAnalytics(analytics);
       } catch (error) {
         console.error(error);
+      } finally {
+        if (isActive) setAnalyticsLoading(false);
       }
     }
 
     loadAnalytics();
-  }, [event._id, mode]);
+
+    return () => {
+      isActive = false;
+    };
+  }, [event?._id, mode]);
 
   if (!event) return null;
 
@@ -149,6 +162,8 @@ const EventDetailsLayout = ({
               loading="lazy"
               className="h-full w-full object-cover shadow-2xl transition duration-300 hover:scale-105 rounded-xl sm:w-100"
             />
+            {/* {" "} */}
+            {/* || <img src="https://placehold.co" alt="" /> */}
           </div>
           <div className="mt-10 flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-semibold">
@@ -218,6 +233,7 @@ const EventDetailsLayout = ({
           {isOrganizer && (
             <AnalyticsPanel
               analytics={analytics}
+              loading={analyticsLoading}
               selectedFilter={guestFilter}
               onSelectFilter={setGuestFilter}
             />

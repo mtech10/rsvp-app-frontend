@@ -7,6 +7,9 @@ import { getGuests, approveGuest, rejectGuest } from "../services/rsvpService";
 import { exportGuestsToCSV } from "../utility/exportGuests";
 import toast from "react-hot-toast";
 import ConfirmationModal from "../components/ui/ConfirmationModal";
+import LoadingScreen from "../components/ui/LoadingScreen";
+import ErrorState from "../components/ui/ErrorState";
+import EventDetailsSkeleton from "../components/skeletons/EventDetailsSkeleton";
 
 export default function ManageEvent() {
   const { id } = useParams();
@@ -55,11 +58,18 @@ export default function ManageEvent() {
       setGuests(guestData.guests);
     } catch (err) {
       console.error(err);
+      throw err;
     }
   };
 
   const handleExport = () => {
-    exportGuestsToCSV(event, filteredGuests);
+    try {
+      exportGuestsToCSV(event, filteredGuests);
+      toast.success("Guest list exported successfully.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Failed to export the guest list.");
+    }
   };
 
   useEffect(() => {
@@ -88,7 +98,7 @@ export default function ManageEvent() {
       navigate("/my-events");
     } catch (err) {
       console.error(err);
-      toast.error("Failed to delete event.");
+      toast.error(err.message || "Failed to delete event.");
     }
   };
 
@@ -96,8 +106,10 @@ export default function ManageEvent() {
     try {
       await approveGuest(rsvpId);
       await refreshGuests();
+      toast.success("Guest approved successfully.");
     } catch (err) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(err.message || "Failed to approve guest.");
     }
   };
 
@@ -105,15 +117,33 @@ export default function ManageEvent() {
     try {
       await rejectGuest(rsvpId);
       await refreshGuests();
+      toast.success("Guest registration rejected.");
     } catch (err) {
-      toast.error(err.message);
+      console.error(err);
+      toast.error(err.message || "Failed to reject guest.");
     }
   };
 
-  if (loading) return <h2>Loading...</h2>;
+  if (loading) {
+    return <EventDetailsSkeleton mode="organizer" />;
+  }
 
-  if (error) return <h2>{error}</h2>;
-
+  if (error) {
+    return (
+      <ErrorState
+        title="Unable to load event"
+        description={error}
+        action={
+          <button
+            onClick={() => navigate("/my-events")}
+            className="rounded-xl bg-slate-900 px-5 py-3 text-white hover:bg-slate-800"
+          >
+            Back to My Events
+          </button>
+        }
+      />
+    );
+  }
   return (
     <>
       <EventDetailsLayout

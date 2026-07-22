@@ -7,6 +7,7 @@ import { getEvents } from "../../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 
 import toast from "react-hot-toast";
+import DiscoverSkeleton from "../skeletons/DiscoverSkeleton";
 
 export default function EventCards({ category = null, showAll = false }) {
   const [events, setEvents] = useState([]);
@@ -100,8 +101,14 @@ export default function EventCards({ category = null, showAll = false }) {
       const rsvp = await getMyRSVP(selectedId);
 
       setMyRSVP(rsvp.rsvp);
+      toast.success(
+        selectedEvent?.requireApproval
+          ? "Registration request submitted successfully."
+          : "RSVP confirmed successfully.",
+      );
     } catch (error) {
-      toast.error(err.message);
+      console.error(error);
+      toast.error(error.message || "Failed to submit RSVP.");
     }
   };
 
@@ -110,13 +117,15 @@ export default function EventCards({ category = null, showAll = false }) {
       await cancelRSVP(selectedId);
 
       setMyRSVP(null);
+      toast.success("Registration cancelled successfully.");
     } catch (error) {
-      toast.error(err.message);
+      console.error(error);
+      toast.error(error.message || "Failed to cancel registration.");
     }
   };
 
   if (loading) {
-    return <h2>Loading events...</h2>;
+    return <DiscoverSkeleton />;
   }
 
   return (

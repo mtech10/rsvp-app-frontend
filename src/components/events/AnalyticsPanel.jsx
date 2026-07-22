@@ -1,12 +1,16 @@
 import { Users, CheckCircle2, Clock3, XCircle, BarChart3 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 import RecentActivity from "./RecentActivity";
+import AnalyticsPanelSkeleton from "../skeletons/AnalyticsPanelSkeleton";
 
 export default function AnalyticsPanel({
   analytics,
+  loading,
   selectedFilter,
   onSelectFilter,
 }) {
+  if (loading) return <AnalyticsPanelSkeleton />;
+
   if (!analytics) return null;
 
   const cards = [

@@ -215,12 +215,14 @@ const EventForm = ({ mode = "create", event = null }) => {
     try {
       const { url } = await uploadImageToCloudinary(file, setUploadProgress);
       setImageUrl(url);
+      toast.success("Event image uploaded successfully.");
     } catch (err) {
       const message =
         err instanceof CloudinaryConfigError
           ? err.message
           : "Couldn't upload that image. Try again.";
       setUploadError(message);
+      toast.error(message);
     } finally {
       setUploadProgress(null);
     }
@@ -259,20 +261,24 @@ const EventForm = ({ mode = "create", event = null }) => {
         requireApproval,
       };
 
+      const savedEvent =
+        mode === "create"
+          ? await createEvent(eventData)
+          : await updateEvent(event._id, eventData);
+
       if (mode === "create") {
-        await createEvent(eventData);
         toast.success("Event created successfully.");
       } else {
-        await updateEvent(event._id, eventData);
         toast.success("Event updated successfully.");
       }
 
-      const updatedEvent = await updateEvent(event._id, eventData);
-
-      navigate(`/my-events/${updatedEvent.event._id}`);
+      navigate(`/my-events/${savedEvent.event._id}`);
     } catch (err) {
       console.error(err);
-      toast.error(err.message);
+      toast.error(
+        err.message ||
+          `Failed to ${mode === "create" ? "create" : "update"} event.`,
+      );
     } finally {
       setSubmitting(false);
     }

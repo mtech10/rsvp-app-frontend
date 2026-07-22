@@ -8,6 +8,7 @@ import SectionHeader from "../components/ui/SectionHeader";
 import OrganizerDashboardHeader from "../components/events/OrganizerDashboardHeader";
 import DashboardStats from "../components/events/DashboardStats";
 import Toolbar from "../components/Toolbar";
+import EventCardSkeleton from "../components/skeletons/EventCardSkeleton";
 
 export default function MyEvents() {
   const navigate = useNavigate();
@@ -33,7 +34,15 @@ export default function MyEvents() {
   }, []);
 
   if (loading) {
-    return <h2>Loading...</h2>;
+    return (
+      <div className="mx-auto max-w-5xl">
+        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <EventCardSkeleton key={index} />
+          ))}
+        </div>
+      </div>
+    );
   }
 
   const totalEvents = events.length;
