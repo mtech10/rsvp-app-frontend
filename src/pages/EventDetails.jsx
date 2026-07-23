@@ -7,6 +7,8 @@ import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
 import toast from "react-hot-toast";
 
 import EventDetailsSkeleton from "../components/skeletons/EventDetailsSkeleton";
+import PageLoader from "../components/ui/PageLoader";
+
 export default function EventDetails() {
   const { id } = useParams();
 
@@ -71,16 +73,14 @@ export default function EventDetails() {
     }
   }
 
-  if (loading) {
-    return <EventDetailsSkeleton />;
-  }
-
   return (
-    <EventDetailsLayout
-      event={event}
-      myRSVP={myRSVP}
-      onRsvp={handleRsvp}
-      onCancel={handleCancel}
-    />
+    <PageLoader loading={loading} skeleton={<EventDetailsSkeleton />}>
+      <EventDetailsLayout
+        event={event}
+        myRSVP={myRSVP}
+        onRsvp={handleRsvp}
+        onCancel={handleCancel}
+      />
+    </PageLoader>
   );
 }

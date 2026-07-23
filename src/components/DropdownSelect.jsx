@@ -32,7 +32,7 @@ export default function DropdownSelect({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex min-w-[170px] items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
+        className="flex min-w-42.5 items-center justify-between rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-medium shadow-sm transition hover:border-slate-300 hover:bg-slate-50"
       >
         <div className="flex items-center gap-2">
           {Icon && <Icon size={16} className="text-slate-500" />}
