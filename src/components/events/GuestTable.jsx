@@ -1,4 +1,6 @@
 import { User, Mail, Ticket, Check, X } from "lucide-react";
+import { motion } from "framer-motion";
+import { fadeUp, staggerContainer } from "../../animations/motion";
 import StatusBadge from "./StatusBadge";
 
 export default function GuestTable({ guests, onApprove, onReject }) {
@@ -47,9 +49,17 @@ export default function GuestTable({ guests, onApprove, onReject }) {
               </tr>
             </thead>
 
-            <tbody>
+            <motion.tbody
+              variants={staggerContainer}
+              initial="hidden"
+              animate="visible"
+            >
               {guests.map((guest) => (
-                <tr key={guest._id} className="border-t border-slate-100">
+                <motion.tr
+                  key={guest._id}
+                  variants={fadeUp}
+                  className="border-t border-slate-100"
+                >
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 font-semibold text-slate-700">
@@ -107,9 +117,9 @@ export default function GuestTable({ guests, onApprove, onReject }) {
                       </div>
                     )}
                   </td>
-                </tr>
+                </motion.tr>
               ))}
-            </tbody>
+            </motion.tbody>
           </table>
         </div>
       )}

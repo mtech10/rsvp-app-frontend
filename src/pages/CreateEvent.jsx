@@ -1,5 +1,12 @@
 import EventForm from "../components/events/EventForm";
+import PageTransition from "../components/ui/PageTransition";
 
 export default function CreateEvent() {
-  return <EventForm mode="create" />;
+  return (
+    <>
+      <PageTransition>
+        <EventForm mode="create" />;
+      </PageTransition>
+    </>
+  );
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 
 import AuthLayout from "../components/layouts/AuthLayout";
 import { register as registerService } from "../services/authService";
+import { motion } from "framer-motion";
 
 export default function Register() {
   const [name, setName] = useState("");
@@ -105,13 +106,19 @@ export default function Register() {
 
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
           type="submit"
           disabled={loading}
           className="w-full rounded-lg bg-black py-3 font-semibold text-white transition hover:bg-gray-800 disabled:bg-gray-400"
         >
           {loading ? "Creating Account..." : "Create Account"}
-        </button>
+        </motion.button>
 
         <p className="text-center text-sm text-gray-600">
           Already have an account?{" "}

@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { login as loginService, getCurrentUser } from "../services/authService";
 import AuthLayout from "../components/layouts/AuthLayout";
+import { motion } from "framer-motion";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -69,17 +70,21 @@ export default function Login() {
           />
         </div>
 
-        {/* Error */}
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        {/* Button */}
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
           type="submit"
           disabled={loading}
           className="w-full rounded-lg bg-black py-3 font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:bg-gray-400"
         >
           {loading ? "Logging in..." : "Login"}
-        </button>
+        </motion.button>
 
         <p className="text-center text-sm text-gray-600">
           Don't have an account?{" "}

@@ -13,26 +13,36 @@ createRoot(document.getElementById("root")).render(
       <Toaster
         position="bottom-right"
         reverseOrder={false}
+        gutter={12}
+        containerStyle={{
+          bottom: 24,
+          right: 24,
+        }}
         toastOptions={{
-          duration: 3000,
+          duration: 3500,
+
           style: {
-            borderRadius: "14px",
-            background: "#0f172a",
-            color: "#fff",
+            borderRadius: "16px",
+            background: "#ffffff",
+            color: "#0f172a",
+            border: "1px solid #e2e8f0",
+            boxShadow: "0 10px 25px rgba(15,23,42,0.08)",
+            padding: "14px 18px",
             fontSize: "14px",
+            fontWeight: 500,
           },
 
           success: {
             iconTheme: {
-              primary: "#22c55e",
-              secondary: "#fff",
+              primary: "#16a34a",
+              secondary: "#ffffff",
             },
           },
 
           error: {
             iconTheme: {
-              primary: "#ef4444",
-              secondary: "#fff",
+              primary: "#dc2626",
+              secondary: "#ffffff",
             },
           },
         }}

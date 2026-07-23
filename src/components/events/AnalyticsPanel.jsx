@@ -2,6 +2,7 @@ import { Users, CheckCircle2, Clock3, XCircle, BarChart3 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 import RecentActivity from "./RecentActivity";
 import AnalyticsPanelSkeleton from "../skeletons/AnalyticsPanelSkeleton";
+import { motion } from "framer-motion";
 
 export default function AnalyticsPanel({
   analytics,
@@ -57,7 +58,7 @@ export default function AnalyticsPanel({
   ];
 
   return (
-    <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
+    <motion.div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
       <div className="mb-8 flex items-center gap-3">
         <div className="rounded-xl bg-slate-100 p-3">
           <BarChart3 className="text-slate-700" size={22} />
@@ -77,23 +78,16 @@ export default function AnalyticsPanel({
           const Icon = card.icon;
 
           return (
-            <div
+            <motion.div
               key={card.title}
               onClick={() => onSelectFilter(card.filter)}
-              className={`
-    ${card.bg}
-    ${card.border}
-    rounded-2xl
-    border
-    p-6
-    cursor-pointer
-    transition-all
-    duration-300
-    hover:-translate-y-1
-    hover:shadow-lg
-
-    ${selectedFilter === card.filter ? "ring-2 ring-slate-900 shadow-lg" : ""}
-  `}
+              whileHover={{
+                y: -6,
+              }}
+              whileTap={{
+                scale: 0.98,
+              }}
+              className={`${card.bg} ${card.border} rounded-2xl border p-6 cursor-pointer   transition-all duration-300   hover:-translate-y-1 hover:shadow-lg ${selectedFilter === card.filter ? "ring-2 ring-slate-900 shadow-lg" : ""}`}
             >
               <div className="mb-5 flex items-center justify-between">
                 <span className="text-sm font-medium text-slate-600">
@@ -108,7 +102,7 @@ export default function AnalyticsPanel({
               </h3>
 
               <p className="mt-2 text-sm text-slate-500">{card.subtitle}</p>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -152,6 +146,6 @@ export default function AnalyticsPanel({
       <div className="mt-8">
         <RecentActivity data={analytics.recentRSVPs} />
       </div>
-    </div>
+    </motion.div>
   );
 }

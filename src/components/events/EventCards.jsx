@@ -9,6 +9,9 @@ import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 import toast from "react-hot-toast";
 import DiscoverSkeleton from "../skeletons/DiscoverSkeleton";
 
+import { motion } from "framer-motion";
+import { staggerContainer } from "../../animations/motion";
+
 export default function EventCards({ category = null, showAll = false }) {
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
@@ -130,7 +133,12 @@ export default function EventCards({ category = null, showAll = false }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+      <motion.div
+        variants={staggerContainer}
+        initial="hidden"
+        animate="visible"
+        className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2"
+      >
         {events.map((event) => (
           <EventCardItem
             key={event._id}
@@ -139,7 +147,7 @@ export default function EventCards({ category = null, showAll = false }) {
             onClick={() => setSelectedId(event._id)}
           />
         ))}
-      </div>
+      </motion.div>
 
       {selectedEvent && (
         <div

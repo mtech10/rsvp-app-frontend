@@ -1,6 +1,7 @@
 import { Outlet } from "react-router-dom";
 import Topbar from "../Topbar";
 import Footer from "../Footer";
+import LayoutTransition from "../ui/LayoutTransition";
 
 export default function MainLayout() {
   return (
@@ -8,7 +9,9 @@ export default function MainLayout() {
       <Topbar />
 
       <main className="mx-auto max-w-6xl px-6 py-10">
-        <Outlet />
+        <LayoutTransition>
+          <Outlet />
+        </LayoutTransition>
       </main>
 
       <Footer />

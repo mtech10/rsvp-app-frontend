@@ -29,5 +29,9 @@ export default function EditEvent() {
     return <p>Loading...</p>;
   }
 
-  return <EventForm mode="edit" event={event} />;
+  return (
+    <>
+      <EventForm mode="edit" event={event} />; ;
+    </>
+  );
 }

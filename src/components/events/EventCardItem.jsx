@@ -1,4 +1,6 @@
 import React from "react";
+import { motion } from "framer-motion";
+import { fadeUp } from "../../animations/motion";
 
 const formatEventDate = (value) => {
   if (!value) return "TBD";
@@ -39,38 +41,40 @@ const EventCardItem = ({
     (event.locationType === "online" ? "Online" : "Various locations");
 
   return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`group flex w-full overflow-hidden rounded-xl border p-0 text-left transition cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${
-        selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
-      }`}
-    >
-      <div className="relative w-32 shrink-0 overflow-hidden">
-        <img
-          src={event.coverUrl || "https://placehold.co/600x400?text=Event"}
-          alt={event.title}
-          className="h-full w-full object-cover"
-          loading="lazy"
-        />
-      </div>
-
-      <div className="flex flex-1 flex-col justify-between p-5">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
-            {dateText}
-          </p>
-
-          <h3 className="mt-2 line-clamp-2 text-lg font-semibold text-slate-900">
-            {event.title}
-          </h3>
-
-          <p className="mt-1 text-sm text-slate-600">{address}</p>
-
-          <p className="mt-1 text-sm font-medium text-slate-500">{city}</p>
+    <motion.div variants={fadeUp}>
+      <button
+        type="button"
+        onClick={onClick}
+        className={`group flex w-full overflow-hidden rounded-xl border p-0 text-left transition cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${
+          selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
+        }`}
+      >
+        <div className="relative w-32 shrink-0 overflow-hidden">
+          <img
+            src={event.coverUrl || "https://placehold.co/600x400?text=Event"}
+            alt={event.title}
+            className="h-full w-full object-cover"
+            loading="lazy"
+          />
         </div>
-      </div>
-    </button>
+
+        <div className="flex flex-1 flex-col justify-between p-5">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-slate-500">
+              {dateText}
+            </p>
+
+            <h3 className="mt-2 line-clamp-2 text-lg font-semibold text-slate-900">
+              {event.title}
+            </h3>
+
+            <p className="mt-1 text-sm text-slate-600">{address}</p>
+
+            <p className="mt-1 text-sm font-medium text-slate-500">{city}</p>
+          </div>
+        </div>
+      </button>
+    </motion.div>
   );
 };
 

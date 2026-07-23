@@ -1,10 +1,18 @@
+import { motion } from "framer-motion";
+import { staggerContainer } from "../../animations/motion";
+
 export default function StatsGrid({
   cards,
   className = "",
   columns = "md:grid-cols-4",
 }) {
   return (
-    <div className={`mt-8 grid grid-cols-2 gap-4 ${columns} ${className}`}>
+    <motion.div
+      variants={staggerContainer}
+      initial="hidden"
+      animate="visible"
+      className={`mt-8 grid grid-cols-2 gap-4 ${columns} ${className}`}
+    >
       {cards.map((card) => {
         const Icon = card.icon;
 
@@ -29,6 +37,6 @@ export default function StatsGrid({
           </div>
         );
       })}
-    </div>
+    </motion.div>
   );
 }

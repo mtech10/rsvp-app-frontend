@@ -21,6 +21,7 @@ import GuestTable from "./GuestTable";
 import RegistrationSection from "./RegistrationSection";
 import { getEventAnalytics } from "../../services/eventService";
 import AnalyticsPanel from "./AnalyticsPanel";
+import { motion } from "framer-motion";
 
 const EventDetailsLayout = ({
   event,

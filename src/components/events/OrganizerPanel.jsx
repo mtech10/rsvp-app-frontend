@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Download, Pencil, Trash2 } from "lucide-react";
+import { motion } from "framer-motion";
 
 export default function OrganizerPanel({ event, onDelete, onExport }) {
   const navigate = useNavigate();
@@ -11,7 +12,13 @@ export default function OrganizerPanel({ event, onDelete, onExport }) {
       </h2>
 
       <div className="space-y-3">
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
           onClick={() => navigate(`/my-events/${event._id}/edit`)}
           className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-left transition-all duration-200 hover:border-slate-300 hover:bg-slate-50"
         >
@@ -23,9 +30,15 @@ export default function OrganizerPanel({ event, onDelete, onExport }) {
               Update event details, location and schedule.
             </p>
           </div>
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
           onClick={onDelete}
           className="flex w-full items-center gap-3 rounded-xl border border-red-200 px-4 py-3 text-left transition-all duration-200 hover:border-red-300 hover:bg-red-50"
         >
@@ -37,15 +50,21 @@ export default function OrganizerPanel({ event, onDelete, onExport }) {
               Permanently remove this event and all associated RSVPs.
             </p>
           </div>
-        </button>
+        </motion.button>
 
-        <button
+        <motion.button
+          whileHover={{
+            scale: 1.02,
+          }}
+          whileTap={{
+            scale: 0.98,
+          }}
           onClick={onExport}
           className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
         >
           <Download size={18} />
           Export Guests
-        </button>
+        </motion.button>
       </div>
     </div>
   );
