@@ -1,4 +1,5 @@
 import { Users, UserCheck, Clock3, UserX } from "lucide-react";
+import { DashboardSection, DashboardStatCard } from "../dashboard";
 import StatsGrid from "../ui/StatsGrid";
 
 export default function GuestStats({ stats }) {
@@ -33,5 +34,14 @@ export default function GuestStats({ stats }) {
     },
   ];
 
-  return <StatsGrid cards={guestcards} />;
+  return (
+    <DashboardSection
+      title="Guest Statistics"
+      description="Overview of event registrations."
+      icon={Users}
+      className="mt-8"
+    >
+      <StatsGrid cards={guestcards} />
+    </DashboardSection>
+  );
 }

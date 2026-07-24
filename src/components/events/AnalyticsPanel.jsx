@@ -2,7 +2,7 @@ import { Users, CheckCircle2, Clock3, XCircle, BarChart3 } from "lucide-react";
 import AnalyticsChart from "./AnalyticsChart";
 import RecentActivity from "./RecentActivity";
 import AnalyticsPanelSkeleton from "../skeletons/AnalyticsPanelSkeleton";
-import { motion } from "framer-motion";
+import { DashboardSection, DashboardStatCard } from "../dashboard";
 
 export default function AnalyticsPanel({
   analytics,
@@ -58,53 +58,27 @@ export default function AnalyticsPanel({
   ];
 
   return (
-    <motion.div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
-      <div className="mb-8 flex items-center gap-3">
-        <div className="rounded-xl bg-slate-100 p-3">
-          <BarChart3 className="text-slate-700" size={22} />
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-bold text-slate-900">Event Analytics</h2>
-
-          <p className="text-sm text-slate-500">
-            Live performance of your event.
-          </p>
-        </div>
-      </div>
-
+    <DashboardSection
+      className="mt-8"
+      title="Event Analytics"
+      description="Live performance of your event."
+      icon={BarChart3}
+    >
       <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-        {cards.map((card) => {
-          const Icon = card.icon;
-
-          return (
-            <motion.div
-              key={card.title}
-              onClick={() => onSelectFilter(card.filter)}
-              whileHover={{
-                y: -6,
-              }}
-              whileTap={{
-                scale: 0.98,
-              }}
-              className={`${card.bg} ${card.border} rounded-2xl border p-6 cursor-pointer   transition-all duration-300   hover:-translate-y-1 hover:shadow-lg ${selectedFilter === card.filter ? "ring-2 ring-slate-900 shadow-lg" : ""}`}
-            >
-              <div className="mb-5 flex items-center justify-between">
-                <span className="text-sm font-medium text-slate-600">
-                  {card.title}
-                </span>
-
-                <Icon size={22} className={card.iconColor} />
-              </div>
-
-              <h3 className="text-4xl font-bold text-slate-900">
-                {card.value}
-              </h3>
-
-              <p className="mt-2 text-sm text-slate-500">{card.subtitle}</p>
-            </motion.div>
-          );
-        })}
+        {cards.map((card) => (
+          <DashboardStatCard
+            key={card.title}
+            icon={card.icon}
+            title={card.title}
+            value={card.value}
+            subtitle={card.subtitle}
+            iconColor={card.iconColor}
+            bg={card.bg}
+            border={card.border}
+            active={selectedFilter === card.filter}
+            onClick={() => onSelectFilter(card.filter)}
+          />
+        ))}
       </div>
 
       {analytics.capacity > 0 ? (
@@ -139,13 +113,13 @@ export default function AnalyticsPanel({
           </p>
         </div>
       )}
-      <div className="mt-8">
+      <div className="mt-10">
         <AnalyticsChart data={analytics.dailyRSVPs} />
       </div>
 
-      <div className="mt-8">
+      <div className="mt-10">
         <RecentActivity data={analytics.recentRSVPs} />
       </div>
-    </motion.div>
+    </DashboardSection>
   );
 }

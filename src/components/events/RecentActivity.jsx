@@ -1,13 +1,15 @@
-import { CheckCircle2, Clock3, XCircle } from "lucide-react";
+import { CheckCircle2, Clock3, XCircle, Activity } from "lucide-react";
+
+import { DashboardSection, DashboardEmptyState } from "../dashboard";
 
 export default function RecentActivity({ data }) {
   if (!data?.length) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold">Recent Activity</h3>
-
-        <p className="mt-4 text-sm text-slate-500">No RSVP activity yet.</p>
-      </div>
+      <DashboardEmptyState
+        icon={Activity}
+        title="No Recent Activity"
+        description="Guest registrations and updates will appear here."
+      />
     );
   }
 
@@ -38,16 +40,21 @@ export default function RecentActivity({ data }) {
   };
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-6 text-lg font-semibold">Recent Activity</h3>
-
+    <DashboardSection
+      title="Recent Activity"
+      description="Latest RSVP updates from your guests."
+      icon={Activity}
+    >
       <div className="space-y-4">
         {data.map((item) => {
           const config = statusMap[item.status];
           const Icon = config.icon;
 
           return (
-            <div key={item._id} className="flex items-center justify-between">
+            <div
+              key={item._id}
+              className="flex items-center justify-between rounded-xl border border-slate-100 p-4 transition hover:bg-slate-50"
+            >
               <div className="flex items-center gap-4">
                 <div
                   className={`rounded-full bg-slate-100 p-2 ${config.color}`}
@@ -56,19 +63,21 @@ export default function RecentActivity({ data }) {
                 </div>
 
                 <div>
-                  <p className="font-medium">{item.user?.name}</p>
-
+                  <p className="font-semibold text-slate-900">
+                    {item.user?.name}
+                  </p>
                   <p className="text-sm text-slate-500">{config.label}</p>
                 </div>
               </div>
 
-              <span className="text-xs text-slate-400">
+              <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-500">
+                {" "}
                 {new Date(item.updatedAt).toLocaleDateString()}
               </span>
             </div>
           );
         })}
       </div>
-    </div>
+    </DashboardSection>
   );
 }

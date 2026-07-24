@@ -387,7 +387,7 @@ const EventForm = ({ mode = "create", event = null }) => {
             {/* Start / End + timezone */}
             <div className="mt-6 flex flex-col md:flex-row gap-2">
               <div className="relative flex-1 divide-y divide-slate-200/70 rounded-2xl border border-slate-200/70 bg-white/60 md:flex-col">
-                <div className="absolute left-[26px] top-6 bottom-6 w-px bg-slate-300" />
+                <div className="absolute left-6.5 top-6 bottom-6 w-px bg-slate-300" />
                 <DateTimeRow
                   label="Start"
                   dotFilled

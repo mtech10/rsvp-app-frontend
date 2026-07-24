@@ -1,87 +1,3 @@
-// export const fadeUp = {
-//   hidden: {
-//     opacity: 0,
-//     y: 20,
-//   },
-//   visible: {
-//     opacity: 1,
-//     y: 0,
-//     transition: {
-//       duration: 0.35,
-//       ease: "easeOut",
-//     },
-//   },
-// };
-
-// export const fade = {
-//   hidden: {
-//     opacity: 0,
-//   },
-//   visible: {
-//     opacity: 1,
-//     transition: {
-//       duration: 0.3,
-//     },
-//   },
-// };
-
-// export const staggerContainer = {
-//   hidden: {},
-//   visible: {
-//     transition: {
-//       staggerChildren: 0.08,
-//     },
-//   },
-// };
-
-// export const scaleIn = {
-//   hidden: {
-//     opacity: 0,
-//     scale: 0.95,
-//   },
-//   visible: {
-//     opacity: 1,
-//     scale: 1,
-//     transition: {
-//       duration: 0.3,
-//       ease: "easeOut",
-//     },
-//   },
-// };
-
-// export const hoverLift = {
-//   whileHover: {
-//     y: -4,
-//     transition: {
-//       duration: 0.2,
-//     },
-//   },
-//   whileTap: {
-//     scale: 0.98,
-//   },
-// };
-
-// export const menuItem = {
-//   hidden: {
-//     opacity: 0,
-//     x: -8,
-//   },
-//   visible: {
-//     opacity: 1,
-//     x: 0,
-//   },
-// };
-
-// export const menuContainer = {
-//   hidden: {},
-//   visible: {
-//     transition: {
-//       staggerChildren: 0.04,
-//       delayChildren: 0.05,
-//     },
-//   },
-// };
-
 // Fade In
 export const fade = {
   hidden: { opacity: 0 },
@@ -215,5 +131,80 @@ export const hoverGrow = {
   },
   whileTap: {
     scale: 0.97,
+  },
+};
+
+export const cardHover = {
+  rest: {
+    y: 0,
+    scale: 1,
+  },
+
+  hover: {
+    y: -4,
+    scale: 1.01,
+
+    transition: {
+      duration: 0.2,
+    },
+  },
+};
+
+export const buttonTap = {
+  tap: {
+    scale: 0.98,
+  },
+};
+
+export const fadeScale = {
+  hidden: {
+    opacity: 0,
+    scale: 0.97,
+  },
+
+  visible: {
+    opacity: 1,
+    scale: 1,
+
+    transition: {
+      duration: 0.25,
+    },
+  },
+
+  exit: {
+    opacity: 0,
+    scale: 0.97,
+  },
+};
+
+export const slideRight = {
+  hidden: {
+    opacity: 0,
+    x: -12,
+  },
+
+  visible: {
+    opacity: 1,
+    x: 0,
+
+    transition: {
+      duration: 0.25,
+    },
+  },
+};
+
+export const slideLeft = {
+  hidden: {
+    opacity: 0,
+    x: 12,
+  },
+
+  visible: {
+    opacity: 1,
+    x: 0,
+
+    transition: {
+      duration: 0.25,
+    },
   },
 };

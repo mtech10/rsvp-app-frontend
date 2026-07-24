@@ -7,17 +7,18 @@ import {
   Tooltip,
   CartesianGrid,
 } from "recharts";
+import { TrendingUp } from "lucide-react";
+
+import { DashboardSection, DashboardEmptyState } from "../dashboard";
 
 export default function AnalyticsChart({ data }) {
   if (!data?.length) {
     return (
-      <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h3 className="text-lg font-semibold">RSVP Trend</h3>
-
-        <p className="mt-4 text-sm text-slate-500">
-          No RSVP data available yet.
-        </p>
-      </div>
+      <DashboardEmptyState
+        icon={TrendingUp}
+        title="No RSVP Data"
+        description="RSVP activity will appear here once guests begin registering."
+      />
     );
   }
 
@@ -30,9 +31,11 @@ export default function AnalyticsChart({ data }) {
   }));
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h3 className="mb-6 text-lg font-semibold text-slate-900">RSVP Trend</h3>
-
+    <DashboardSection
+      title="RSVP Trend"
+      description="Daily registrations over time."
+      icon={TrendingUp}
+    >
       <div className="h-72">
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={chartData}>
@@ -55,6 +58,6 @@ export default function AnalyticsChart({ data }) {
           </LineChart>
         </ResponsiveContainer>
       </div>
-    </div>
+    </DashboardSection>
   );
 }

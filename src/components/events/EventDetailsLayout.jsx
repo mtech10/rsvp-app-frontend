@@ -22,6 +22,8 @@ import RegistrationSection from "./RegistrationSection";
 import { getEventAnalytics } from "../../services/eventService";
 import AnalyticsPanel from "./AnalyticsPanel";
 import { motion } from "framer-motion";
+import EventOverviewCard from "./EventOverviewCard";
+import EventCover from "../ui/EventCover";
 
 const EventDetailsLayout = ({
   event,
@@ -157,62 +159,20 @@ const EventDetailsLayout = ({
 
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20 pt-8 sm:px-12">
           <div className="relative flex justify-center">
-            <img
+            <EventCover
               src={event.coverUrl}
-              alt={`${event.title} event cover`}
-              loading="lazy"
-              className="h-full w-full object-cover shadow-2xl transition duration-300 hover:scale-105 rounded-xl sm:w-100"
+              alt={`${event.title} cover`}
+              className="w-full sm:w-[400px]"
             />
-            {/* {" "} */}
-            {/* || <img src="https://placehold.co" alt="" /> */}
-          </div>
-          <div className="mt-10 flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-100 font-semibold">
-              {event.host?.name?.charAt(0)}
-            </div>
-
-            <div>
-              <p className="text-sm text-slate-500">Hosted by</p>
-
-              <p className="font-semibold">{event.host?.name}</p>
-            </div>
-          </div>
-          <div className="flex justify-between">
-            <h3 className="text-3xl font-bold text-slate-900">{event.title}</h3>
           </div>
 
-          <div className="mt-10 flex justify-between gap-4 sm:items-center rounded-3xl bg-slate-50">
-            <div className="flex gap-3">
-              <div className="rounded-sm p-1 bg-slate-100  border border-slate-200 text-center shadow-sm backdrop-blur-sm">
-                <span className="block text-xs font-semibold uppercase tracking-[0.28em] text-slate-600 ">
-                  {date.month}
-                </span>
-                <span className="mt-1 text-xl font-bold tracking-tight text-slate-800">
-                  {date.day}
-                </span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-base font-semibold text-slate-900">
-                  {date.weekday}, {date.month} {date.day}
-                </span>
-                <span className="mt-1 text-sm  text-slate-600">
-                  {date.time} - {endDate.time}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex gap-2 items-center rounded-3xl bg-slate-50 p-5">
-              <MapPin size={30} />
-              <div className="flex flex-col">
-                <span className="mt-2 text-sm text-slate-900 font-semibold">
-                  {addressLabel}
-                </span>
-                <span className="mt-1 text-base  text-slate-600">
-                  {cityLabel}
-                </span>
-              </div>
-            </div>
-          </div>
+          <EventOverviewCard
+            event={event}
+            date={date}
+            endDate={endDate}
+            addressLabel={addressLabel}
+            cityLabel={cityLabel}
+          />
 
           <div className="flex flex-col">
             <p className="text-slate-600 text-md">About Event</p>

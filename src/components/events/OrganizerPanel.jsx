@@ -1,71 +1,65 @@
 import { useNavigate } from "react-router-dom";
-import { Download, Pencil, Trash2 } from "lucide-react";
-import { motion } from "framer-motion";
+import { Download, Pencil, Trash2, Settings, Share2 } from "lucide-react";
+import {
+  DashboardSection,
+  DashboardActionCard,
+  DashboardActionList,
+} from "../dashboard";
+import { useState } from "react";
+import ShareEventModal from "../overlays/ShareEventModal";
 
 export default function OrganizerPanel({ event, onDelete, onExport }) {
+  const [shareOpen, setShareOpen] = useState(false);
+
   const navigate = useNavigate();
 
   return (
-    <div className="mt-10 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-      <h2 className="mb-5 text-lg font-semibold text-slate-900">
-        Organizer Actions
-      </h2>
+    <>
+      <DashboardSection
+        className="mt-10"
+        title="Organizer Actions"
+        description="Manage this event."
+        icon={Settings}
+      >
+        {" "}
+        <DashboardActionList>
+          <DashboardActionCard
+            icon={Pencil}
+            title="Edit Event"
+            description="Update event details, location and schedule."
+            onClick={() => navigate(`/my-events/${event._id}/edit`)}
+          />
 
-      <div className="space-y-3">
-        <motion.button
-          whileHover={{
-            scale: 1.02,
-          }}
-          whileTap={{
-            scale: 0.98,
-          }}
-          onClick={() => navigate(`/my-events/${event._id}/edit`)}
-          className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-left transition-all duration-200 hover:border-slate-300 hover:bg-slate-50"
-        >
-          <Pencil size={18} className="text-slate-600" />
+          <DashboardActionCard
+            icon={Download}
+            title="Export Guests"
+            description="Download attendee registrations."
+            onClick={onExport}
+          />
 
-          <div>
-            <p className="font-medium text-slate-900">Edit Event</p>
-            <p className="text-sm text-slate-500">
-              Update event details, location and schedule.
-            </p>
-          </div>
-        </motion.button>
+          <DashboardActionCard
+            icon={Trash2}
+            title="Delete Event"
+            description="Permanently remove this event and every RSVP."
+            variant="danger"
+            onClick={onDelete}
+          />
 
-        <motion.button
-          whileHover={{
-            scale: 1.02,
-          }}
-          whileTap={{
-            scale: 0.98,
-          }}
-          onClick={onDelete}
-          className="flex w-full items-center gap-3 rounded-xl border border-red-200 px-4 py-3 text-left transition-all duration-200 hover:border-red-300 hover:bg-red-50"
-        >
-          <Trash2 size={18} className="text-red-600" />
-
-          <div>
-            <p className="font-medium text-red-600">Delete Event</p>
-            <p className="text-sm text-slate-500">
-              Permanently remove this event and all associated RSVPs.
-            </p>
-          </div>
-        </motion.button>
-
-        <motion.button
-          whileHover={{
-            scale: 1.02,
-          }}
-          whileTap={{
-            scale: 0.98,
-          }}
-          onClick={onExport}
-          className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 px-4 py-3 text-sm font-medium text-slate-700 transition hover:bg-slate-50"
-        >
-          <Download size={18} />
-          Export Guests
-        </motion.button>
-      </div>
-    </div>
+          <DashboardActionCard
+            icon={Share2}
+            title="Share Event"
+            description="Invite others to this event."
+            onClick={() => setShareOpen(true)}
+          />
+        </DashboardActionList>
+      </DashboardSection>
+      <ShareEventModal
+        isOpen={shareOpen}
+        onClose={() => setShareOpen(false)}
+        event={event}
+        url={`${window.location.origin}/events/${event._id}`}
+      />
+      ;
+    </>
   );
 }
