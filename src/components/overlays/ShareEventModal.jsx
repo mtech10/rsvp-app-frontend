@@ -1,124 +1,93 @@
-import { Link2, Share2, Mail, MessageCircle, Linkedin } from "lucide-react";
-import toast from "react-hot-toast";
-import { DashboardActionCard, DashboardActionList } from "../dashboard";
-import { AnimatePresence, motion } from "framer-motion";
+import { Share2, Mail, MessageCircle, Globe } from "lucide-react";
+import ModalWrapper from "./ModalWrapper";
+import QuickActionGrid from "../ui/QuickActionGrid";
+import useEventActions from "../../hooks/useEventActions";
 
-export default function ShareEventModal({ isOpen, onClose, event, url }) {
-  async function handleCopy() {
-    try {
-      await navigator.clipboard.writeText(url);
-
-      toast.success("Event link copied!");
-    } catch {
-      toast.error("Unable to copy link.");
-    }
-  }
-
-  async function handleNativeShare() {
-    if (!navigator.share) {
-      handleCopy();
-      return;
-    }
-
-    try {
-      await navigator.share({
-        title: event.title,
-        text: event.description,
-        url,
-      });
-    } catch {}
-  }
-
-  function openWindow(link) {
-    window.open(link, "_blank", "noopener,noreferrer");
-  }
-
-  function shareWhatsapp() {
-    openWindow(`https://wa.me/?text=${encodeURIComponent(url)}`);
-  }
-
-  function shareEmail() {
-    openWindow(
-      `mailto:?subject=${encodeURIComponent(event.title)}&body=${encodeURIComponent(url)}`,
-    );
-  }
-
-  function shareLinkedIn() {
-    openWindow(
-      `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`,
-    );
-  }
+export default function ShareEventModal({ isOpen, onClose, event }) {
+  const {
+    eventUrl,
+    copyLink,
+    nativeShare,
+    shareWhatsapp,
+    shareEmail,
+    shareLinkedIn,
+  } = useEventActions(event);
 
   if (!isOpen) return null;
 
+  const shareActions = [
+    {
+      label: "WhatsApp",
+      icon: MessageCircle,
+      onClick: shareWhatsapp,
+    },
+    {
+      label: "Email",
+      icon: Mail,
+      onClick: shareEmail,
+    },
+    {
+      label: "LinkedIn",
+      icon: Globe,
+      onClick: shareLinkedIn,
+    },
+    {
+      label: "Share",
+      icon: Share2,
+      onClick: nativeShare,
+    },
+  ];
+
   return (
-    <AnimatePresence>
-      <motion.div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-        <motion.div className="w-full max-w-md rounded-3xl bg-white shadow-2xl">
-          <div className="border-b border-slate-100 p-6">
-            <h2 className="text-xl font-bold text-slate-900">Share Event</h2>
+    <ModalWrapper
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Share Event"
+      subtitle={`Invite people to ${event?.title}`}
+    >
+      <div className="overflow-hidden rounded-2xl border border-slate-200">
+        <div className="relative h-36 bg-slate-100">
+          <img
+            src={
+              event?.coverImage ||
+              "https://images.unsplash.com/photo-1511578314322-379afb476865?w=1200"
+            }
+            alt={event?.title}
+            className="h-full w-full object-cover"
+          />
 
-            <p className="mt-2 text-sm text-slate-500">
-              Invite people to
-              <span className="font-medium text-slate-700">
-                {" "}
-                {event?.title}
-              </span>
-            </p>
-          </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+        </div>
 
-          <div className="p-4">
-            <DashboardActionList>
-              <DashboardActionCard
-                icon={Link2}
-                title="Copy Link"
-                description="Copy the event URL."
-                onClick={handleCopy}
-              />
+        <div className="bg-white p-5">
+          <h2 className="text-xl font-bold text-slate-900">{event?.title}</h2>
 
-              <DashboardActionCard
-                icon={Share2}
-                title="Share"
-                description="Use your device's share menu."
-                onClick={handleNativeShare}
-              />
+          <p className="mt-2 text-sm text-slate-500">{event?.formattedDate}</p>
+        </div>
+      </div>
 
-              <DashboardActionCard
-                icon={MessageCircle}
-                title="WhatsApp"
-                description="Share with your contacts."
-                onClick={shareWhatsapp}
-              />
+      <QuickActionGrid actions={shareActions} className="justify-evenly" />
 
-              <DashboardActionCard
-                icon={Mail}
-                title="Email"
-                description="Send by email."
-                onClick={shareEmail}
-              />
+      <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-slate-500">
+          Event Link
+        </p>
 
-              <DashboardActionCard
-                icon={Linkedin}
-                title="LinkedIn"
-                description="Share professionally."
-                onClick={shareLinkedIn}
-              />
-            </DashboardActionList>
-          </div>
+        <div className="flex items-center gap-3">
+          <input
+            readOnly
+            value={eventUrl}
+            className="flex-1 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm"
+          />
 
-          <div className="border-t border-slate-100 p-4">
-            <button
-              onClick={onClose}
-              className="w-full rounded-xl bg-slate-100 py-3 font-medium transition hover:bg-slate-200"
-            >
-              Close
-            </button>
-          </div>
-          {/* Share Actions */}
-
-          {/* Footer */}
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          <button
+            onClick={copyLink}
+            className="rounded-xl bg-slate-900 px-5 py-3 text-sm font-medium text-white transition hover:bg-slate-800"
+          >
+            Copy
+          </button>
+        </div>
+      </div>
+    </ModalWrapper>
   );
 }

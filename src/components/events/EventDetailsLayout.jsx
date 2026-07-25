@@ -24,6 +24,7 @@ import AnalyticsPanel from "./AnalyticsPanel";
 import { motion } from "framer-motion";
 import EventOverviewCard from "./EventOverviewCard";
 import EventCover from "../ui/EventCover";
+import useEventActions from "../../hooks/useEventActions";
 
 const EventDetailsLayout = ({
   event,
@@ -87,6 +88,8 @@ const EventDetailsLayout = ({
 
   if (!event) return null;
 
+  const { copyLink, openPublicPage } = useEventActions(event);
+
   const isOrganizer = mode === "organizer";
 
   const date = formatDateParts(event.startAt);
@@ -132,11 +135,19 @@ const EventDetailsLayout = ({
           </button>
           {!isOrganizer && (
             <div className="flex items-center gap-2">
-              <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-                <Copy size={14} /> Copy Link
+              <button
+                onClick={copyLink}
+                className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
+              >
+                <Copy size={14} />
+                Copy Link
               </button>
-              <button className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200">
-                Event Page <ArrowUpRight size={14} />
+              <button
+                onClick={openPublicPage}
+                className="flex items-center gap-2 rounded-lg bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-700 transition hover:bg-slate-200"
+              >
+                Open Event Page
+                <ArrowUpRight size={14} />
               </button>
             </div>
           )}
@@ -160,7 +171,7 @@ const EventDetailsLayout = ({
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20 pt-8 sm:px-12">
           <div className="relative flex justify-center">
             <EventCover
-              src={event.coverUrl}
+              src={event.coverImage}
               alt={`${event.title} cover`}
               className="w-full sm:w-[400px]"
             />
@@ -173,13 +184,6 @@ const EventDetailsLayout = ({
             addressLabel={addressLabel}
             cityLabel={cityLabel}
           />
-
-          <div className="flex flex-col">
-            <p className="text-slate-600 text-md">About Event</p>
-            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-900">
-              {event.description}
-            </p>
-          </div>
 
           {isOrganizer && (
             <OrganizerPanel

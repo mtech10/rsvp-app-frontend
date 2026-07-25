@@ -92,7 +92,7 @@ export default function EventCards({ category = null, showAll = false }) {
       setSelectedId(events[currentIndex + 1]._id);
     }
 
-    if (direction === "previous" && currentIndex > 0) {
+    if (direction === "prev" && currentIndex > 0) {
       setSelectedId(events[currentIndex - 1]._id);
     }
   };

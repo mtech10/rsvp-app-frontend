@@ -1,5 +1,4 @@
 import { useState } from "react";
-import EventPlaceholder from "../../assets/event-placeholder.png";
 import { IMAGES } from "../../assets/images";
 
 export default function EventCover({ src, alt, className = "" }) {
@@ -10,7 +9,7 @@ export default function EventCover({ src, alt, className = "" }) {
       src={image}
       alt={alt}
       loading="lazy"
-      onError={() => setImage(IMAGES.EVENT_PLACEHOLDER)}
+      onError={() => setImage(IMAGES)}
       className={`rounded-2xl object-cover shadow-2xl transition duration-300 hover:scale-[1.02] ${className}`}
     />
   );
