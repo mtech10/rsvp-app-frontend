@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 
 import EventCardItem from "./EventCardItem";
 import EventDetailsLayout from "./EventDetailsLayout";
-
+import { useRSVP } from "../../context/RSVPContext";
 import { getEvents } from "../../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 
@@ -13,6 +13,7 @@ import { motion } from "framer-motion";
 import { staggerContainer } from "../../animations/motion";
 
 export default function EventCards({ category = null, showAll = false }) {
+  const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -104,13 +105,17 @@ export default function EventCards({ category = null, showAll = false }) {
       const rsvp = await getMyRSVP(selectedId);
 
       setMyRSVP(rsvp.rsvp);
+
+      addRsvp(selectedEvent, rsvp.rsvp);
+
       toast.success(
         selectedEvent?.requireApproval
           ? "Registration request submitted successfully."
           : "RSVP confirmed successfully.",
       );
     } catch (error) {
-      console.error(error);
+      console.error("❌ DISCOVER RSVP ERROR:", error);
+
       toast.error(error.message || "Failed to submit RSVP.");
     }
   };
@@ -120,9 +125,13 @@ export default function EventCards({ category = null, showAll = false }) {
       await cancelRSVP(selectedId);
 
       setMyRSVP(null);
+
+      removeRsvp(selectedId);
+
       toast.success("Registration cancelled successfully.");
     } catch (error) {
-      console.error(error);
+      console.error("❌ DISCOVER CANCEL ERROR:", error);
+
       toast.error(error.message || "Failed to cancel registration.");
     }
   };

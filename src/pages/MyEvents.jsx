@@ -103,60 +103,136 @@ export default function MyEvents() {
       }
     });
 
+  // return (
+  //   <div className="mx-auto max-w-5xl">
+  //     {events.length === 0 ? (
+  //       <EmptyState
+  //         title="No Upcoming Events"
+  //         description="You have no upcoming events. Why not host one?"
+  //         actionText="Create Event"
+  //         actionTo="/create"
+  //       />
+  //     ) : (
+  //       <>
+  //         <OrganizerDashboardHeader
+  //           totalEvents={events.length}
+  //           onCreateEvent={() => navigate("/create")}
+  //         />
+
+  //         <Toolbar
+  //           search={search}
+  //           setSearch={setSearch}
+  //           filter={filter}
+  //           setFilter={setFilter}
+  //           sort={sort}
+  //           setSort={setSort}
+  //         />
+
+  //         <DashboardStats
+  //           totalEvents={totalEvents}
+  //           totalGuests={totalGuests}
+  //           pendingGuests={pendingGuests}
+  //           cancelledGuests={cancelledGuests}
+  //         />
+
+  //         {filteredEvents.length === 0 ? (
+  //           <EmptyState
+  //             title="No Matching Events"
+  //             description="Try a different search term."
+  //           />
+  //         ) : (
+  //           <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+  //             {filteredEvents.map((event) => (
+  //               <EventCardItem
+  //                 key={event._id}
+  //                 event={event}
+  //                 variant="my-events"
+  //                 onClick={() => navigate(`/my-events/${event._id}`)}
+  //               />
+  //             ))}
+  //           </div>
+  //         )}
+  //       </>
+  //     )}
+
+  //     {filteredEvents.length === 0 ? (
+  //       <EmptyState
+  //         title={
+  //           events.length === 0 ? "No Upcoming Events" : "No Matching Events"
+  //         }
+  //         description={
+  //           events.length === 0
+  //             ? "You have no upcoming events. Why not host one?"
+  //             : "Try a different search term."
+  //         }
+  //         actionText={events.length === 0 ? "Create Event" : undefined}
+  //         actionTo={events.length === 0 ? "/create" : undefined}
+  //       />
+  //     ) : (
+  //       <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+  //         {filteredEvents.map((event) => (
+  //           <EventCardItem
+  //             key={event._id}
+  //             event={event}
+  //             variant="my-events"
+  //             onClick={() => navigate(`/my-events/${event._id}`)}
+  //           />
+  //         ))}
+  //       </div>
+  //     )}
+  //   </div>
+  // );
+
   return (
     <div className="mx-auto max-w-5xl">
-      <OrganizerDashboardHeader
-        totalEvents={events.length}
-        onCreateEvent={() => navigate("/create")}
-      />
-
-      <Toolbar
-        search={search}
-        setSearch={setSearch}
-        filter={filter}
-        setFilter={setFilter}
-        sort={sort}
-        setSort={setSort}
-      />
-
-      <DashboardStats
-        totalEvents={totalEvents}
-        totalGuests={totalGuests}
-        pendingGuests={pendingGuests}
-        cancelledGuests={cancelledGuests}
-      />
-
-      {filteredEvents.length === 0 ? (
+      {events.length === 0 ? (
         <EmptyState
-          icon={CalendarPlus}
-          title={events.length === 0 ? "No events yet" : "No matching events"}
-          description={
-            events.length === 0
-              ? "Create your first event to start inviting people."
-              : "Try a different search term."
-          }
-          action={
-            events.length === 0 && (
-              <button
-                onClick={() => navigate("/create")}
-                className="rounded-lg bg-black px-5 py-3 text-white transition hover:bg-slate-800"
-              >
-                Create Event
-              </button>
-            )
-          }
+          title="No Upcoming Events"
+          description="You have no upcoming events. Why not host one?"
+          actionText="Create Event"
+          actionTo="/create"
         />
       ) : (
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
-          {filteredEvents.map((event) => (
-            <EventCardItem
-              key={event._id}
-              event={event}
-              variant="my-events"
-              onClick={() => navigate(`/my-events/${event._id}`)}
+        <>
+          <OrganizerDashboardHeader
+            totalEvents={events.length}
+            onCreateEvent={() => navigate("/create")}
+          />
+
+          <Toolbar
+            search={search}
+            setSearch={setSearch}
+            filter={filter}
+            setFilter={setFilter}
+            sort={sort}
+            setSort={setSort}
+          />
+
+          <DashboardStats
+            totalEvents={totalEvents}
+            totalGuests={totalGuests}
+            pendingGuests={pendingGuests}
+            cancelledGuests={cancelledGuests}
+          />
+
+          {filteredEvents.length === 0 ? (
+            <EmptyState
+              title="No Matching Events"
+              description="Try a different search term."
             />
-          ))}
-        </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-2">
+              {filteredEvents.map((event) => (
+                <EventCardItem
+                  key={event._id}
+                  event={event}
+                  variant="my-events"
+                  onClick={() => navigate(`/my-events/${event._id}`)}
+                />
+              ))}
+            </div>
+          )}
+        </>
       )}
     </div>
   );

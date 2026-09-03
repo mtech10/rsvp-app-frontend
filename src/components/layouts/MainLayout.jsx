@@ -5,14 +5,20 @@ import LayoutTransition from "../ui/LayoutTransition";
 
 export default function MainLayout() {
   return (
-    <div className="min-h-screen bg-linear-to-t from-slate-50 to-blue-100">
-      <Topbar />
+    <div className="min-h-screen bg-white">
+      <div className="relative">
+        <div className="absolute inset-x-0 top-0 h-[320px] bg-gradient-to-b from-[#e5f5fc] via-[#f8fbfd] to-white" />
 
-      <main className="mx-auto max-w-6xl px-6 py-10">
-        <LayoutTransition>
-          <Outlet />
-        </LayoutTransition>
-      </main>
+        <div className="relative z-10">
+          <Topbar />
+
+          <main className="mx-auto max-w-6xl px-6 py-10">
+            <LayoutTransition>
+              <Outlet />
+            </LayoutTransition>
+          </main>
+        </div>
+      </div>
 
       <Footer />
     </div>

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
+import { useRSVP } from "../context/RSVPContext";
 
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getEvent } from "../services/eventService";
@@ -11,6 +12,7 @@ import PageLoader from "../components/ui/PageLoader";
 
 export default function EventDetails() {
   const { id } = useParams();
+  const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
 
   const [event, setEvent] = useState(null);
   const [myRSVP, setMyRSVP] = useState(null);
@@ -38,25 +40,48 @@ export default function EventDetails() {
 
   async function handleRsvp(tickets = 1) {
     try {
-      await createRSVP(id, tickets);
+      const response = await createRSVP(id, tickets);
 
       const [eventData, rsvpData] = await Promise.all([
         getEvent(id),
         getMyRSVP(id),
       ]);
 
-      setEvent(eventData.event);
-      setMyRSVP(rsvpData.rsvp);
+      const updatedEvent = eventData.event;
+      const updatedRsvp = rsvpData.rsvp;
+
+      setEvent(updatedEvent);
+      setMyRSVP(updatedRsvp);
+
+      addRsvp(updatedEvent, updatedRsvp);
+
       toast.success(
-        eventData.event.requireApproval
+        updatedEvent.requireApproval
           ? "Registration request submitted successfully."
           : "RSVP confirmed successfully.",
       );
     } catch (err) {
-      console.error(err);
+      console.error("❌ RSVP ERROR:", err);
+      console.error("❌ Error message:", err.message);
+      console.error("❌ Error response:", err.response);
       toast.error(err.message || "Failed to submit RSVP.");
     }
   }
+
+  // async function handleCancel() {
+  //   try {
+  //     await cancelRSVP(id);
+
+  //     const eventData = await getEvent(id);
+
+  //     setEvent(eventData.event);
+  //     setMyRSVP(null);
+  //     toast.success("Registration cancelled successfully.");
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(err.message || "Failed to cancel registration.");
+  //   }
+  // }
 
   async function handleCancel() {
     try {
@@ -66,6 +91,10 @@ export default function EventDetails() {
 
       setEvent(eventData.event);
       setMyRSVP(null);
+
+      // Remove the event from the Events page immediately
+      removeRsvp(id);
+
       toast.success("Registration cancelled successfully.");
     } catch (err) {
       console.error(err);

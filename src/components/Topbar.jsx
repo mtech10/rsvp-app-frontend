@@ -56,14 +56,14 @@ const Topbar = () => {
 
   return (
     <>
-      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-100 bg-white/80 p-4 backdrop-blur">
+      <div className="sticky top-0 z-50 flex items-center justify-between border-b border-slate-100 bg-transparent py-2 px-4 backdrop-blur-md">
+        {" "}
         <Link
           to="/"
           className="text-slate-500 transition-colors hover:text-slate-900"
         >
           <LogoIcon size={20} />
         </Link>
-
         {/* Navigation */}
         <div className="flex items-center gap-6 text-slate-500">
           {navLinks.map((link) => {
@@ -85,7 +85,6 @@ const Topbar = () => {
             );
           })}
         </div>
-
         {/* Right Section */}
         <div className="flex items-center gap-4 text-slate-500">
           <span className="mr-2 text-sm font-medium">{timeString}</span>
