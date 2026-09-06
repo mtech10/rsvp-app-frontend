@@ -34,6 +34,10 @@ export default function App() {
           <Route path="/events/:id" element={<EventDetails />} />
           <Route path="/search" element={<SearchModal />} />
           <Route path="/category/:categoryName" element={<CategoryPage />} />
+          <Route
+            path="/discover/category/:categoryId"
+            element={<CategoryPage />}
+          />
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>

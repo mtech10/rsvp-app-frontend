@@ -31,15 +31,21 @@ import {
 import CenterModal from "../CenterModal";
 import ConnectMeetingModal from "../ConnectMeetingModal";
 
-import { createEvent, updateEvent } from "../../services/eventService";
+import {
+  createEvent,
+  getEvent,
+  updateEvent,
+} from "../../services/eventService";
 import { useNavigate } from "react-router-dom";
 import Popover from "../Popover";
 import toast from "react-hot-toast";
 
 const THEMES = ["Minimal", "Vibrant", "Elegant", "Bold"];
 
-function getCityFromLabel(label) {
-  const parts = label.split(" - ");
+function getCityFromLabel(label = "") {
+  if (!label) return "";
+
+  const parts = String(label).split(" - ");
   return parts[parts.length - 1];
 }
 
@@ -118,7 +124,7 @@ const DateTimeRow = ({
   </div>
 );
 
-const EventForm = ({ mode = "create", event = null }) => {
+const EventForm = ({ mode = "create", event = null, duplicateId = null }) => {
   const fileInputRef = useRef(null);
 
   // --- Cover image / Cloudinary upload ---
@@ -152,6 +158,93 @@ const EventForm = ({ mode = "create", event = null }) => {
 
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!duplicateId || mode !== "create") return;
+
+    let active = true;
+
+    async function loadDuplicateEvent() {
+      try {
+        const data = await getEvent(duplicateId);
+        const sourceEvent = data?.event;
+
+        if (!active || !sourceEvent) return;
+
+        setEventName(sourceEvent.title || "");
+        setDescription(sourceEvent.description || "");
+        setTheme(sourceEvent.theme || "Minimal");
+
+        if (sourceEvent.startAt) {
+          const start = new Date(sourceEvent.startAt);
+          setStartDate(start);
+          setStartTime(
+            start.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+          );
+        }
+
+        if (sourceEvent.endAt) {
+          const end = new Date(sourceEvent.endAt);
+          setEndDate(end);
+          setEndTime(
+            end.toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }),
+          );
+        }
+
+        if (sourceEvent.timezone) {
+          const timezoneValue = sourceEvent.timezone;
+
+          if (typeof timezoneValue === "object") {
+            setTimezone(timezoneValue);
+          }
+        }
+
+        setVisibility(sourceEvent.visibility || "public");
+
+        setTicket({
+          isPaid: sourceEvent.ticketType === "paid",
+          price: sourceEvent.price || "",
+        });
+
+        setCapacity(sourceEvent.capacity ?? null);
+        setRequireApproval(sourceEvent.requireApproval || false);
+
+        if (sourceEvent.locationType === "in_person") {
+          setLocation({
+            name: sourceEvent.venue || "",
+            address: sourceEvent.address || "",
+          });
+        } else {
+          setLocation(null);
+        }
+
+        // Reuse the existing Cloudinary image.
+        if (sourceEvent.coverUrl) {
+          setImageUrl(sourceEvent.coverUrl);
+          setImagePreview(sourceEvent.coverUrl);
+        }
+
+        toast.success("Event details loaded for duplication.");
+      } catch (error) {
+        console.error("DUPLICATE EVENT ERROR:", error);
+        toast.error("Unable to load event for duplication.");
+      }
+    }
+
+    loadDuplicateEvent();
+
+    return () => {
+      active = false;
+    };
+  }, [duplicateId, mode]);
 
   useEffect(() => {
     if (mode !== "edit" || !event) return;
@@ -201,7 +294,6 @@ const EventForm = ({ mode = "create", event = null }) => {
       });
     }
   }, [event, mode]);
-
   const handlePickImage = () => fileInputRef.current?.click();
 
   const handleImageChange = async (e) => {
@@ -423,7 +515,7 @@ const EventForm = ({ mode = "create", event = null }) => {
                       {formatGmtOffset(timezone.offsetMinutes)}
                     </span>
                     <span className="text-xs text-slate-500">
-                      {getCityFromLabel(timezone.label)}
+                      {getCityFromLabel(timezone?.label)}
                     </span>
                   </button>
                 )}

@@ -8,15 +8,49 @@ export function createEvent(eventData) {
 }
 
 export function getMyEvents() {
-  return apiFetch("/events/my-events", {});
+  return apiFetch("/events/my-events");
 }
 
 export function getEvent(id) {
-  return apiFetch(`/events/${id}`, {});
+  return apiFetch(`/events/${id}`);
 }
 
-export function getEvents() {
-  return apiFetch("/events");
+export function getEvents(params = {}) {
+  const searchParams = new URLSearchParams();
+
+  Object.entries(params).forEach(([key, value]) => {
+    if (value !== undefined && value !== null && value !== "") {
+      searchParams.set(key, value);
+    }
+  });
+
+  const query = searchParams.toString();
+
+  return apiFetch(`/events${query ? `?${query}` : ""}`);
+}
+
+export function getNearbyEvents({
+  latitude,
+  longitude,
+  radius = 25000,
+  category,
+  search,
+} = {}) {
+  const searchParams = new URLSearchParams();
+
+  searchParams.set("latitude", latitude);
+  searchParams.set("longitude", longitude);
+  searchParams.set("radius", radius);
+
+  if (category) {
+    searchParams.set("category", category);
+  }
+
+  if (search) {
+    searchParams.set("search", search);
+  }
+
+  return apiFetch(`/events/nearby?${searchParams.toString()}`);
 }
 
 export function updateEvent(id, eventData) {
@@ -36,6 +70,6 @@ export function getEventById(id) {
   return apiFetch(`/events/${id}`);
 }
 
-export async function getEventAnalytics(eventId) {
+export function getEventAnalytics(eventId) {
   return apiFetch(`/events/${eventId}/analytics`);
 }

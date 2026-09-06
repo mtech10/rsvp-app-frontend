@@ -52,6 +52,7 @@ const EventDetailsLayout = ({
   onExport,
   guestFilter,
   setGuestFilter,
+  hideRegistration = false,
 }) => {
   const [ticketCount, setTicketCount] = useState(1);
   const [showApprovalForm, setShowApprovalForm] = useState(false);
@@ -171,9 +172,9 @@ const EventDetailsLayout = ({
         <div className="flex flex-1 flex-col overflow-y-auto px-6 pb-20 pt-8 sm:px-12">
           <div className="relative flex justify-center">
             <EventCover
-              src={event.coverImage}
+              src={event.coverUrl}
               alt={`${event.title} cover`}
-              className="w-full sm:w-[400px]"
+              className="w-full sm:w-[400px] sm:h-[400px]"
             />
           </div>
 
@@ -220,20 +221,22 @@ const EventDetailsLayout = ({
             </p>
           </div>
 
-          <RegistrationSection
-            event={event}
-            myRSVP={myRSVP}
-            loading={loading}
-            ticketCount={ticketCount}
-            onIncrement={handleIncrement}
-            onDecrement={handleDecrement}
-            onRegister={() => handleRsvpAction(ticketCount)}
-            onCancel={() => onCancel?.(event._id)}
-            UserProfileInfo={UserProfileInfo}
-            showApprovalForm={showApprovalForm}
-            setShowApprovalForm={setShowApprovalForm}
-            submitApprovalRequest={submitApprovalRequest}
-          />
+          {!isOrganizer && !hideRegistration && (
+            <RegistrationSection
+              event={event}
+              myRSVP={myRSVP}
+              loading={loading}
+              ticketCount={ticketCount}
+              onIncrement={handleIncrement}
+              onDecrement={handleDecrement}
+              onRegister={() => handleRsvpAction(ticketCount)}
+              onCancel={() => onCancel?.(event._id)}
+              UserProfileInfo={UserProfileInfo}
+              showApprovalForm={showApprovalForm}
+              setShowApprovalForm={setShowApprovalForm}
+              submitApprovalRequest={submitApprovalRequest}
+            />
+          )}
         </div>
       </div>
     </>

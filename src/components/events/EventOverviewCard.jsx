@@ -70,7 +70,7 @@ export default function EventOverviewCard({
                 : "bg-purple-100 text-purple-700"
             }
           >
-            {event.visibility}
+            {event.visibility === "public" ? "Public" : event.visibility}
           </Badge>
 
           <Badge
@@ -80,7 +80,7 @@ export default function EventOverviewCard({
                 : "bg-amber-100 text-amber-700"
             }
           >
-            {event.ticketType}
+            {event.ticketType === "free" ? "Free" : event.ticketType}
           </Badge>
 
           <Badge color="bg-slate-100 text-slate-700">

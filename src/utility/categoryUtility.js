@@ -33,3 +33,14 @@ export const hashString = (s) => {
 export const getCategoryIcon = (categoryName) => {
   return icons[hashString(categoryName) % icons.length];
 };
+
+export const getEventCategories = (events = []) => {
+  return [
+    ...new Set(
+      events
+        .map((event) => event.category)
+        .filter(Boolean)
+        .map((category) => category.trim()),
+    ),
+  ].sort((a, b) => a.localeCompare(b));
+};

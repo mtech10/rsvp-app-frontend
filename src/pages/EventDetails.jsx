@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useRSVP } from "../context/RSVPContext";
-
+import { useAuth } from "../context/AuthContext";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getEvent } from "../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
@@ -12,6 +12,8 @@ import PageLoader from "../components/ui/PageLoader";
 
 export default function EventDetails() {
   const { id } = useParams();
+
+  const { user } = useAuth();
   const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
 
   const [event, setEvent] = useState(null);
@@ -68,21 +70,6 @@ export default function EventDetails() {
     }
   }
 
-  // async function handleCancel() {
-  //   try {
-  //     await cancelRSVP(id);
-
-  //     const eventData = await getEvent(id);
-
-  //     setEvent(eventData.event);
-  //     setMyRSVP(null);
-  //     toast.success("Registration cancelled successfully.");
-  //   } catch (err) {
-  //     console.error(err);
-  //     toast.error(err.message || "Failed to cancel registration.");
-  //   }
-  // }
-
   async function handleCancel() {
     try {
       await cancelRSVP(id);
@@ -102,6 +89,18 @@ export default function EventDetails() {
     }
   }
 
+  const eventHostId =
+    typeof event?.host === "object"
+      ? event.host?._id || event.host?.id
+      : event?.host;
+
+  const currentUserId = user?._id || user?.id;
+
+  const isHost =
+    Boolean(eventHostId) &&
+    Boolean(currentUserId) &&
+    String(eventHostId) === String(currentUserId);
+
   return (
     <PageLoader loading={loading} skeleton={<EventDetailsSkeleton />}>
       <EventDetailsLayout
@@ -109,6 +108,7 @@ export default function EventDetails() {
         myRSVP={myRSVP}
         onRsvp={handleRsvp}
         onCancel={handleCancel}
+        mode={isHost ? "organizer" : "public"}
       />
     </PageLoader>
   );

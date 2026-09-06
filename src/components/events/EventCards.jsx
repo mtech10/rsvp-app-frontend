@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import EventCardItem from "./EventCardItem";
 import EventDetailsLayout from "./EventDetailsLayout";
 import { useRSVP } from "../../context/RSVPContext";
+import { useAuth } from "../../context/AuthContext";
 import { getEvents } from "../../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 
@@ -14,6 +15,8 @@ import { staggerContainer } from "../../animations/motion";
 
 export default function EventCards({ category = null, showAll = false }) {
   const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
+  const { user } = useAuth();
+
   const [events, setEvents] = useState([]);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
@@ -23,7 +26,9 @@ export default function EventCards({ category = null, showAll = false }) {
   useEffect(() => {
     async function loadEvents() {
       try {
-        const data = await getEvents();
+        const data = await getEvents({
+          date: "upcoming",
+        });
 
         let filtered = data.events || [];
 
@@ -140,6 +145,17 @@ export default function EventCards({ category = null, showAll = false }) {
     return <DiscoverSkeleton />;
   }
 
+  // Check whether the selected event belongs to the logged-in user.
+  const eventHostId =
+    selectedEvent?.host?._id || selectedEvent?.host?.id || selectedEvent?.host;
+
+  const currentUserId = user?._id || user?.id;
+
+  const isHost =
+    Boolean(eventHostId) &&
+    Boolean(currentUserId) &&
+    String(eventHostId) === String(currentUserId);
+
   return (
     <>
       <motion.div
@@ -174,6 +190,7 @@ export default function EventCards({ category = null, showAll = false }) {
               onCancel={handleCancel}
               onClose={() => setSelectedId(null)}
               onNavigate={handleNavigate}
+              hideRegistration={isHost}
             />
           </div>
         </div>
