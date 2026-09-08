@@ -19,6 +19,7 @@ import ManageEvent from "./pages/ManageEvent";
 import EditEvent from "./pages/EditEvent";
 import EventDetails from "./pages/EventDetails";
 import Profile from "./pages/Profile";
+import HomePage from "./pages/HomePage";
 
 export default function App() {
   return (
@@ -28,7 +29,7 @@ export default function App() {
         <Route path="/register" element={<Register />} />
 
         <Route element={<MainLayout />}>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/home" element={<HomePage />} />
           <Route path="/calendars" element={<CalendarPage />} />
           <Route path="/discover" element={<DiscoverEvents />} />
           <Route path="/events/:id" element={<EventDetails />} />
@@ -41,6 +42,7 @@ export default function App() {
         </Route>
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
+            <Route path="/" element={<LandingPage />} />
             <Route path="/create" element={<CreateEvent />} />
             <Route path="/my-events" element={<MyEvents />} />
             <Route path="/my-events/:id" element={<ManageEvent />} />

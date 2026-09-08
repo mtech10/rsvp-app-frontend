@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
+import useRequireAuth from "../hooks/useRequireAuth";
 import { Link, useParams } from "react-router-dom";
 
 import {
@@ -13,13 +13,20 @@ import {
   X,
 } from "lucide-react";
 
-import { getCategories } from "../services/categoryService";
+import {
+  getCategories,
+  getFollowedCategories,
+  followCategory,
+  unfollowCategory,
+} from "../services/categoryService";
+
 import { getEvents, getNearbyEvents } from "../services/eventService";
 
 import EventCardItem from "../components/events/EventCardItem";
 import EventDetailsLayout from "../components/events/EventDetailsLayout";
 
 import { useRSVP } from "../context/RSVPContext";
+import { useAuth } from "../context/AuthContext";
 
 import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
 
@@ -28,9 +35,14 @@ import toast from "react-hot-toast";
 export default function CategoryPage() {
   const { categoryId } = useParams();
 
+  const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
+
   const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
 
   const [category, setCategory] = useState(null);
+  const [categoryLoading, setCategoryLoading] = useState(true);
+
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -39,7 +51,6 @@ export default function CategoryPage() {
   const [locationFilter, setLocationFilter] = useState("all");
 
   const [showFilters, setShowFilters] = useState(false);
-
   const [isFollowing, setIsFollowing] = useState(false);
 
   const [userLocation, setUserLocation] = useState(null);
@@ -49,18 +60,24 @@ export default function CategoryPage() {
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [myRSVP, setMyRSVP] = useState(null);
 
-  // ----------------------------------------------------------
-  // Load category
-  // ----------------------------------------------------------
-
   useEffect(() => {
+    if (!categoryId) {
+      setCategory(null);
+      setCategoryLoading(false);
+      return;
+    }
+
     let mounted = true;
 
     async function loadCategory() {
       try {
+        setCategoryLoading(true);
+
         const data = await getCategories();
 
-        const found = (data?.categories || []).find(
+        const categories = data?.categories || [];
+
+        const found = categories.find(
           (item) => String(item._id) === String(categoryId),
         );
 
@@ -69,6 +86,14 @@ export default function CategoryPage() {
         }
       } catch (error) {
         console.error("CATEGORY PAGE ERROR:", error);
+
+        if (mounted) {
+          setCategory(null);
+        }
+      } finally {
+        if (mounted) {
+          setCategoryLoading(false);
+        }
       }
     }
 
@@ -79,25 +104,40 @@ export default function CategoryPage() {
     };
   }, [categoryId]);
 
-  // ----------------------------------------------------------
-  // Followed category
-  // ----------------------------------------------------------
-
   useEffect(() => {
-    try {
-      const followed = JSON.parse(
-        localStorage.getItem("followedCategories") || "[]",
-      );
-
-      setIsFollowing(followed.some((id) => String(id) === String(categoryId)));
-    } catch {
+    if (!categoryId || !user) {
       setIsFollowing(false);
+      return;
     }
-  }, [categoryId]);
 
-  // ----------------------------------------------------------
-  // Load events
-  // ----------------------------------------------------------
+    let mounted = true;
+
+    async function loadFollowedCategories() {
+      try {
+        const data = await getFollowedCategories();
+
+        const followed = data?.categories || [];
+
+        if (mounted) {
+          setIsFollowing(
+            followed.some((item) => String(item._id) === String(categoryId)),
+          );
+        }
+      } catch (error) {
+        console.error("FOLLOWED CATEGORIES ERROR:", error);
+
+        if (mounted) {
+          setIsFollowing(false);
+        }
+      }
+    }
+
+    loadFollowedCategories();
+
+    return () => {
+      mounted = false;
+    };
+  }, [categoryId, user]);
 
   useEffect(() => {
     if (!categoryId) return;
@@ -133,6 +173,7 @@ export default function CategoryPage() {
         console.error("CATEGORY EVENTS ERROR:", error);
 
         if (mounted) {
+          setEvents([]);
           toast.error(error.message || "Failed to load events.");
         }
       } finally {
@@ -149,46 +190,9 @@ export default function CategoryPage() {
     };
   }, [categoryId, dateFilter, locationFilter, search, userLocation]);
 
-  // ----------------------------------------------------------
-  // Follow category
-  // ----------------------------------------------------------
-
-  const handleFollowCategory = () => {
-    let followed = [];
-
-    try {
-      followed = JSON.parse(localStorage.getItem("followedCategories") || "[]");
-    } catch {
-      followed = [];
-    }
-
-    const following = followed.some((id) => String(id) === String(categoryId));
-
-    if (following) {
-      followed = followed.filter((id) => String(id) !== String(categoryId));
-
-      setIsFollowing(false);
-
-      toast.success("Category unfollowed.");
-    } else {
-      followed.push(categoryId);
-
-      setIsFollowing(true);
-
-      toast.success("Category followed.");
-    }
-
-    localStorage.setItem("followedCategories", JSON.stringify(followed));
-  };
-
-  // ----------------------------------------------------------
-  // Location
-  // ----------------------------------------------------------
-
   const requestUserLocation = () => {
     if (!navigator.geolocation) {
       toast.error("Location services are not supported by your browser.");
-
       return;
     }
 
@@ -237,10 +241,6 @@ export default function CategoryPage() {
     }
   };
 
-  // ----------------------------------------------------------
-  // Clear filters
-  // ----------------------------------------------------------
-
   const handleClearFilters = () => {
     setDateFilter("all");
     setLocationFilter("all");
@@ -249,10 +249,6 @@ export default function CategoryPage() {
 
   const hasActiveFilters = dateFilter !== "all" || locationFilter !== "all";
 
-  // ----------------------------------------------------------
-  // Event selection
-  // ----------------------------------------------------------
-
   useEffect(() => {
     if (!selectedId) {
       setSelectedEvent(null);
@@ -260,27 +256,45 @@ export default function CategoryPage() {
       return;
     }
 
-    const event = events.find((item) => item._id === selectedId);
+    const event = events.find(
+      (item) => String(item._id) === String(selectedId),
+    );
 
     if (!event) {
       setSelectedEvent(null);
+      setMyRSVP(null);
       return;
     }
 
     setSelectedEvent(event);
+    setMyRSVP(null);
+
+    if (!user) {
+      return;
+    }
+
+    let active = true;
 
     async function loadRSVP() {
       try {
         const response = await getMyRSVP(selectedId);
 
-        setMyRSVP(response?.rsvp || null);
+        if (active) {
+          setMyRSVP(response?.rsvp || null);
+        }
       } catch {
-        setMyRSVP(null);
+        if (active) {
+          setMyRSVP(null);
+        }
       }
     }
 
     loadRSVP();
-  }, [selectedId, events]);
+
+    return () => {
+      active = false;
+    };
+  }, [selectedId, events, user]);
 
   useEffect(() => {
     document.body.style.overflow = selectedId ? "hidden" : "auto";
@@ -291,13 +305,33 @@ export default function CategoryPage() {
   }, [selectedId]);
 
   const currentIndex = useMemo(
-    () => events.findIndex((event) => event._id === selectedId),
+    () => events.findIndex((event) => String(event._id) === String(selectedId)),
     [events, selectedId],
   );
 
+  const handleFollowCategory = async () => {
+    if (!requireAuth()) return;
+
+    try {
+      if (isFollowing) {
+        await unfollowCategory(categoryId);
+        setIsFollowing(false);
+      } else {
+        await followCategory(categoryId);
+        setIsFollowing(true);
+      }
+    } catch (error) {
+      console.error("CATEGORY FOLLOW ERROR:", error);
+      toast.error(error.message || "Failed to update category follow status.");
+    }
+  };
+
   const handleNavigate = (direction) => {
+    if (currentIndex === -1) return;
+
     if (direction === "next" && currentIndex < events.length - 1) {
       setSelectedId(events[currentIndex + 1]._id);
+      return;
     }
 
     if (direction === "prev" && currentIndex > 0) {
@@ -305,19 +339,29 @@ export default function CategoryPage() {
     }
   };
 
-  // ----------------------------------------------------------
-  // RSVP
-  // ----------------------------------------------------------
+  const eventHostId =
+    typeof selectedEvent?.host === "object"
+      ? selectedEvent?.host?._id || selectedEvent?.host?.id
+      : selectedEvent?.host;
+
+  const currentUserId = user?._id || user?.id;
+
+  const isHost =
+    Boolean(eventHostId) &&
+    Boolean(currentUserId) &&
+    String(eventHostId) === String(currentUserId);
 
   const handleRsvp = async (tickets = 1) => {
+    if (!requireAuth()) return;
+
     try {
       await createRSVP(selectedId, tickets);
 
       const response = await getMyRSVP(selectedId);
 
-      setMyRSVP(response.rsvp);
+      setMyRSVP(response?.rsvp || null);
 
-      addRsvp(selectedEvent, response.rsvp);
+      addRsvp(selectedEvent, response?.rsvp);
 
       toast.success(
         selectedEvent?.requireApproval
@@ -325,11 +369,15 @@ export default function CategoryPage() {
           : "RSVP confirmed successfully.",
       );
     } catch (error) {
+      console.error("RSVP ERROR:", error);
+
       toast.error(error.message || "Failed to submit RSVP.");
     }
   };
 
   const handleCancel = async () => {
+    if (!requireAuth()) return;
+
     try {
       await cancelRSVP(selectedId);
 
@@ -339,13 +387,23 @@ export default function CategoryPage() {
 
       toast.success("Registration cancelled successfully.");
     } catch (error) {
+      console.error("CANCEL RSVP ERROR:", error);
+
       toast.error(error.message || "Failed to cancel registration.");
     }
   };
 
-  // ----------------------------------------------------------
-  // Category not found
-  // ----------------------------------------------------------
+  if (categoryLoading) {
+    return (
+      <section className="mx-auto max-w-6xl px-6 py-20">
+        <div className="animate-pulse">
+          <div className="h-4 w-24 rounded bg-slate-100" />
+          <div className="mt-8 h-12 w-64 rounded bg-slate-100" />
+          <div className="mt-4 h-5 w-96 max-w-full rounded bg-slate-100" />
+        </div>
+      </section>
+    );
+  }
 
   if (!category) {
     return (
@@ -353,6 +411,10 @@ export default function CategoryPage() {
         <h1 className="text-2xl font-semibold text-slate-900">
           Category not found
         </h1>
+
+        <p className="mt-3 text-sm text-slate-500">
+          The category could not be loaded.
+        </p>
 
         <Link
           to="/discover"
@@ -367,7 +429,6 @@ export default function CategoryPage() {
 
   return (
     <section className="mx-auto max-w-6xl px-6 py-8">
-      {/* Back */}
       <Link
         to="/discover"
         className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 transition hover:text-slate-700"
@@ -376,7 +437,6 @@ export default function CategoryPage() {
         Discover
       </Link>
 
-      {/* Category Header */}
       <div className="mt-8 rounded-3xl border border-slate-100 bg-gradient-to-br from-slate-50 via-white to-white px-6 py-10 sm:px-10">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
@@ -418,10 +478,8 @@ export default function CategoryPage() {
         </div>
       </div>
 
-      {/* Search + Filter */}
       <div className="relative mt-8">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          {/* Search */}
           <div className="relative flex-1">
             <Search
               size={18}
@@ -437,7 +495,6 @@ export default function CategoryPage() {
             />
           </div>
 
-          {/* Filter Button */}
           <button
             type="button"
             onClick={() => setShowFilters((value) => !value)}
@@ -458,7 +515,6 @@ export default function CategoryPage() {
           </button>
         </div>
 
-        {/* Filter Dropdown */}
         {showFilters && (
           <div className="absolute right-0 top-16 z-30 w-full rounded-2xl border border-slate-200 bg-white p-5 shadow-xl sm:w-[360px]">
             <div className="flex items-center justify-between">
@@ -483,7 +539,6 @@ export default function CategoryPage() {
             </div>
 
             <div className="mt-5 space-y-5">
-              {/* Date */}
               <div>
                 <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-400">
                   Date
@@ -513,7 +568,6 @@ export default function CategoryPage() {
                 </div>
               </div>
 
-              {/* Location */}
               <div>
                 <label className="mb-2 block text-xs font-medium uppercase tracking-wider text-slate-400">
                   Location
@@ -528,13 +582,12 @@ export default function CategoryPage() {
                   <select
                     value={locationFilter}
                     onChange={(e) => handleLocationChange(e.target.value)}
-                    disabled={locationLoading}
-                    className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-10 pr-9 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-100 disabled:cursor-wait disabled:opacity-60"
+                    className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white pl-10 pr-9 text-sm font-medium text-slate-700 outline-none transition focus:border-slate-300 focus:ring-2 focus:ring-slate-100"
                   >
                     <option value="all">All locations</option>
                     <option value="online">Online</option>
                     <option value="near_me">
-                      {locationLoading ? "Finding your location..." : "Near me"}
+                      {locationLoading ? "Finding nearby events..." : "Near me"}
                     </option>
                   </select>
 
@@ -542,78 +595,30 @@ export default function CategoryPage() {
                     ▾
                   </span>
                 </div>
-
-                {locationFilter === "near_me" && (
-                  <p className="mt-2 text-xs text-slate-400">
-                    Showing events within 25 km of your location.
-                  </p>
-                )}
               </div>
-            </div>
 
-            {/* Filter Footer */}
-            <div className="mt-6 flex items-center justify-between border-t border-slate-100 pt-4">
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                disabled={!hasActiveFilters}
-                className="text-sm font-medium text-slate-400 transition hover:text-slate-700 disabled:cursor-not-allowed disabled:opacity-40"
-              >
-                Clear filters
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowFilters(false)}
-                className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-slate-800"
-              >
-                Done
-              </button>
+              {hasActiveFilters && (
+                <button
+                  type="button"
+                  onClick={handleClearFilters}
+                  className="text-sm font-medium text-slate-500 hover:text-slate-900"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
           </div>
         )}
       </div>
 
-      {/* Active filter summary */}
-      {hasActiveFilters && (
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {dateFilter !== "all" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
-              <CalendarDays size={13} />
-
-              {dateFilter === "today" && "Today"}
-
-              {dateFilter === "week" && "This week"}
-
-              {dateFilter === "weekend" && "This weekend"}
-
-              {dateFilter === "month" && "This month"}
-            </span>
-          )}
-
-          {locationFilter !== "all" && (
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-xs font-medium text-slate-600">
-              <MapPin size={13} />
-
-              {locationFilter === "online" ? "Online" : "Near me"}
-            </span>
-          )}
-        </div>
-      )}
-
-      {/* RESULTS */}
       <div className="mt-10">
         <div className="mb-6">
           <h2 className="text-2xl font-semibold tracking-tight text-slate-950">
-            {category.name} events
+            Events
           </h2>
 
           <p className="mt-1 text-sm text-slate-400">
-            {search
-              ? `Showing results for "${search}"`
-              : locationFilter === "near_me"
-                ? "Events close to your location."
-                : "Discover experiences worth showing up for."}
+            Events in {category.name}.
           </p>
         </div>
 
@@ -627,30 +632,14 @@ export default function CategoryPage() {
             ))}
           </div>
         ) : !events.length ? (
-          <div className="flex min-h-[320px] flex-col items-center justify-center rounded-3xl border border-dashed border-slate-200 bg-slate-50 px-6 text-center">
-            <CalendarDays
-              size={36}
-              strokeWidth={1.5}
-              className="text-slate-300"
-            />
-
-            <h3 className="mt-5 text-lg font-medium text-slate-700">
+          <div className="rounded-2xl border border-slate-100 bg-slate-50 px-6 py-16 text-center">
+            <h3 className="text-lg font-medium text-slate-700">
               No events found
             </h3>
 
-            <p className="mt-2 max-w-md text-sm text-slate-400">
-              Try another date, location, or search term.
+            <p className="mt-2 text-sm text-slate-400">
+              Try changing your search or filters.
             </p>
-
-            {hasActiveFilters && (
-              <button
-                type="button"
-                onClick={handleClearFilters}
-                className="mt-5 rounded-xl bg-white px-4 py-2 text-sm font-medium text-slate-600 shadow-sm ring-1 ring-slate-200 transition hover:bg-slate-50"
-              >
-                Clear filters
-              </button>
-            )}
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
@@ -658,7 +647,6 @@ export default function CategoryPage() {
               <EventCardItem
                 key={event._id}
                 event={event}
-                selected={event._id === selectedId}
                 onClick={() => setSelectedId(event._id)}
               />
             ))}
@@ -666,23 +654,28 @@ export default function CategoryPage() {
         )}
       </div>
 
-      {/* EVENT DETAILS */}
       {selectedEvent && (
         <div
-          onClick={() => setSelectedId(null)}
-          className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-sm"
+          className="fixed inset-0 z-[100] flex justify-end bg-slate-950/35 backdrop-blur-sm"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedId(null);
+            }
+          }}
         >
-          <div
-            onClick={(event) => event.stopPropagation()}
-            className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl"
-          >
+          <div className="flex h-full w-full max-w-2xl flex-col bg-white shadow-2xl">
             <EventDetailsLayout
+              key={selectedEvent._id}
               event={selectedEvent}
+              mode="public"
+              onClose={() => setSelectedId(null)}
+              onNavigate={handleNavigate}
+              currentIndex={currentIndex}
+              totalEvents={events.length}
               myRSVP={myRSVP}
               onRsvp={handleRsvp}
               onCancel={handleCancel}
-              onClose={() => setSelectedId(null)}
-              onNavigate={handleNavigate}
+              hideRegistration={isHost}
             />
           </div>
         </div>

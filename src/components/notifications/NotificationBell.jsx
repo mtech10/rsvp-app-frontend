@@ -6,11 +6,17 @@ export default function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [count, setCount] = useState(0);
 
+  const handleToggle = () => {
+    setOpen((prev) => !prev);
+  };
+
   return (
     <div className="relative">
       <button
         type="button"
-        onClick={() => setOpen((prev) => !prev)}
+        onClick={handleToggle}
+        aria-label="Notifications"
+        aria-expanded={open}
         className="relative rounded-full p-2 transition hover:bg-slate-100"
       >
         <Bell size={18} />

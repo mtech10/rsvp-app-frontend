@@ -4,7 +4,9 @@ import EventCardItem from "./EventCardItem";
 import EventDetailsLayout from "./EventDetailsLayout";
 import { useRSVP } from "../../context/RSVPContext";
 import { useAuth } from "../../context/AuthContext";
-import { getEvents } from "../../services/eventService";
+import useRequireAuth from "../../hooks/useRequireAuth";
+
+import { getEvents, getEvent } from "../../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../../services/rsvpService";
 
 import toast from "react-hot-toast";
@@ -13,17 +15,40 @@ import DiscoverSkeleton from "../skeletons/DiscoverSkeleton";
 import { motion } from "framer-motion";
 import { staggerContainer } from "../../animations/motion";
 
-export default function EventCards({ category = null, showAll = false }) {
+export default function EventCards({
+  category = null,
+  showAll = false,
+  events: providedEvents = null,
+}) {
   const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
   const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
 
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState(providedEvents || []);
   const [selectedId, setSelectedId] = useState(null);
   const [selectedEvent, setSelectedEvent] = useState(null);
   const [myRSVP, setMyRSVP] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(!providedEvents);
 
   useEffect(() => {
+    if (providedEvents) {
+      let filtered = [...providedEvents];
+
+      if (category) {
+        filtered = filtered.filter(
+          (event) => event.category?.toLowerCase() === category.toLowerCase(),
+        );
+      }
+
+      if (!showAll) {
+        filtered = filtered.slice(0, 12);
+      }
+
+      setEvents(filtered);
+      setLoading(false);
+      return;
+    }
+
     async function loadEvents() {
       try {
         const data = await getEvents({
@@ -51,7 +76,7 @@ export default function EventCards({ category = null, showAll = false }) {
     }
 
     loadEvents();
-  }, [category, showAll]);
+  }, [category, showAll, providedEvents]);
 
   useEffect(() => {
     if (!selectedId) {
@@ -60,25 +85,48 @@ export default function EventCards({ category = null, showAll = false }) {
       return;
     }
 
+    let mounted = true;
+
     async function loadSelectedEvent() {
       try {
-        const event = events.find((e) => e._id === selectedId);
+        const data = await getEvent(selectedId);
+        const event = data?.event || data;
+
+        if (!mounted) return;
 
         setSelectedEvent(event);
 
-        try {
-          const rsvp = await getMyRSVP(selectedId);
-          setMyRSVP(rsvp.rsvp);
-        } catch {
+        if (user) {
+          try {
+            const rsvp = await getMyRSVP(selectedId);
+
+            if (mounted) {
+              setMyRSVP(rsvp?.rsvp || null);
+            }
+          } catch {
+            if (mounted) {
+              setMyRSVP(null);
+            }
+          }
+        } else {
           setMyRSVP(null);
         }
       } catch (error) {
-        console.error(error);
+        console.error("LOAD EVENT DETAILS ERROR:", error);
+
+        if (mounted) {
+          setSelectedEvent(null);
+          setMyRSVP(null);
+        }
       }
     }
 
     loadSelectedEvent();
-  }, [selectedId, events]);
+
+    return () => {
+      mounted = false;
+    };
+  }, [selectedId, user]);
 
   useEffect(() => {
     document.body.style.overflow = selectedId ? "hidden" : "auto";
@@ -89,29 +137,32 @@ export default function EventCards({ category = null, showAll = false }) {
   }, [selectedId]);
 
   const currentIndex = useMemo(
-    () => events.findIndex((e) => e._id === selectedId),
+    () => events.findIndex((event) => event._id === selectedId),
     [events, selectedId],
   );
 
   const handleNavigate = (direction) => {
-    if (direction === "next" && currentIndex < events.length - 1) {
-      setSelectedId(events[currentIndex + 1]._id);
-    }
+    if (!selectedId || currentIndex === -1) return;
 
-    if (direction === "prev" && currentIndex > 0) {
-      setSelectedId(events[currentIndex - 1]._id);
-    }
+    const nextIndex =
+      direction === "next" ? currentIndex + 1 : currentIndex - 1;
+
+    if (nextIndex < 0 || nextIndex >= events.length) return;
+
+    setSelectedId(events[nextIndex]._id);
   };
 
   const handleRsvp = async (tickets = 1) => {
+    if (!requireAuth()) return;
+
     try {
       await createRSVP(selectedId, tickets);
 
       const rsvp = await getMyRSVP(selectedId);
 
-      setMyRSVP(rsvp.rsvp);
+      setMyRSVP(rsvp?.rsvp || null);
 
-      addRsvp(selectedEvent, rsvp.rsvp);
+      addRsvp(selectedEvent, rsvp?.rsvp);
 
       toast.success(
         selectedEvent?.requireApproval
@@ -119,24 +170,23 @@ export default function EventCards({ category = null, showAll = false }) {
           : "RSVP confirmed successfully.",
       );
     } catch (error) {
-      console.error("❌ DISCOVER RSVP ERROR:", error);
-
+      console.error("DISCOVER RSVP ERROR:", error);
       toast.error(error.message || "Failed to submit RSVP.");
     }
   };
 
   const handleCancel = async () => {
+    if (!requireAuth()) return;
+
     try {
       await cancelRSVP(selectedId);
 
       setMyRSVP(null);
-
       removeRsvp(selectedId);
 
       toast.success("Registration cancelled successfully.");
     } catch (error) {
-      console.error("❌ DISCOVER CANCEL ERROR:", error);
-
+      console.error("DISCOVER CANCEL ERROR:", error);
       toast.error(error.message || "Failed to cancel registration.");
     }
   };
@@ -145,9 +195,10 @@ export default function EventCards({ category = null, showAll = false }) {
     return <DiscoverSkeleton />;
   }
 
-  // Check whether the selected event belongs to the logged-in user.
   const eventHostId =
-    selectedEvent?.host?._id || selectedEvent?.host?.id || selectedEvent?.host;
+    typeof selectedEvent?.host === "object"
+      ? selectedEvent?.host?._id || selectedEvent?.host?.id
+      : selectedEvent?.host;
 
   const currentUserId = user?._id || user?.id;
 
@@ -155,6 +206,11 @@ export default function EventCards({ category = null, showAll = false }) {
     Boolean(eventHostId) &&
     Boolean(currentUserId) &&
     String(eventHostId) === String(currentUserId);
+
+  const isPastEvent =
+    selectedEvent &&
+    new Date(selectedEvent.endAt || selectedEvent.startAt).getTime() <
+      Date.now();
 
   return (
     <>
@@ -176,13 +232,14 @@ export default function EventCards({ category = null, showAll = false }) {
 
       {selectedEvent && (
         <div
-          onClick={() => setSelectedId(null)}
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) {
+              setSelectedId(null);
+            }
+          }}
           className="fixed inset-0 z-50 flex justify-end bg-slate-900/40 backdrop-blur-sm"
         >
-          <div
-            onClick={(e) => e.stopPropagation()}
-            className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl"
-          >
+          <div className="h-full w-full max-w-2xl overflow-y-auto bg-white shadow-2xl">
             <EventDetailsLayout
               event={selectedEvent}
               myRSVP={myRSVP}
@@ -190,7 +247,9 @@ export default function EventCards({ category = null, showAll = false }) {
               onCancel={handleCancel}
               onClose={() => setSelectedId(null)}
               onNavigate={handleNavigate}
-              hideRegistration={isHost}
+              currentIndex={currentIndex}
+              totalEvents={events.length}
+              hideRegistration={isHost || isPastEvent}
             />
           </div>
         </div>

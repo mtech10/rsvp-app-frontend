@@ -6,6 +6,7 @@ import EventDetailsLayout from "../components/events/EventDetailsLayout";
 import { getEvent } from "../services/eventService";
 import { createRSVP, cancelRSVP, getMyRSVP } from "../services/rsvpService";
 import toast from "react-hot-toast";
+import useRequireAuth from "../hooks/useRequireAuth";
 
 import EventDetailsSkeleton from "../components/skeletons/EventDetailsSkeleton";
 import PageLoader from "../components/ui/PageLoader";
@@ -14,6 +15,8 @@ export default function EventDetails() {
   const { id } = useParams();
 
   const { user } = useAuth();
+  const { requireAuth } = useRequireAuth();
+
   const { addRsvp, cancelRsvp: removeRsvp } = useRSVP();
 
   const [event, setEvent] = useState(null);
@@ -41,6 +44,8 @@ export default function EventDetails() {
   }, [id]);
 
   async function handleRsvp(tickets = 1) {
+    if (!requireAuth()) return;
+
     try {
       const response = await createRSVP(id, tickets);
 
@@ -64,13 +69,13 @@ export default function EventDetails() {
       );
     } catch (err) {
       console.error("❌ RSVP ERROR:", err);
-      console.error("❌ Error message:", err.message);
-      console.error("❌ Error response:", err.response);
       toast.error(err.message || "Failed to submit RSVP.");
     }
   }
 
   async function handleCancel() {
+    if (!requireAuth()) return;
+
     try {
       await cancelRSVP(id);
 
@@ -79,12 +84,12 @@ export default function EventDetails() {
       setEvent(eventData.event);
       setMyRSVP(null);
 
-      // Remove the event from the Events page immediately
       removeRsvp(id);
 
       toast.success("Registration cancelled successfully.");
     } catch (err) {
       console.error(err);
+
       toast.error(err.message || "Failed to cancel registration.");
     }
   }

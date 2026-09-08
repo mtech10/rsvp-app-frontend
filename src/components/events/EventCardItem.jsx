@@ -7,8 +7,11 @@ const formatEventDate = (value) => {
 
   const date = new Date(value);
   const today = new Date();
+
   const midnight = (d) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+
   const diffDays = Math.round((midnight(date) - midnight(today)) / 86_400_000);
+
   const time = new Intl.DateTimeFormat("en-US", {
     hour: "numeric",
     minute: "2-digit",
@@ -34,18 +37,21 @@ const EventCardItem = ({
   onManage,
 }) => {
   const dateText = formatEventDate(event.startAt);
-  const address =
-    event.address || event.venue || "Location details coming soon";
-  const city =
-    event.city ||
-    (event.locationType === "online" ? "Online" : "Various locations");
+
+  const locationText =
+    event.locationType === "online"
+      ? "Online"
+      : event.address ||
+        event.venue ||
+        event.city ||
+        "Location details coming soon";
 
   return (
     <motion.div variants={fadeUp}>
       <button
         type="button"
         onClick={onClick}
-        className={`group flex w-full overflow-hidden rounded-xl border p-0 text-left transition cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${
+        className={`group flex w-full cursor-pointer overflow-hidden rounded-xl border p-0 text-left transition hover:-translate-y-0.5 hover:shadow-lg ${
           selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
         }`}
       >
@@ -68,9 +74,7 @@ const EventCardItem = ({
               {event.title}
             </h3>
 
-            <p className="mt-1 text-sm text-slate-600">{address}</p>
-
-            <p className="mt-1 text-sm font-medium text-slate-500">{city}</p>
+            <p className="mt-1 text-sm text-slate-600">{locationText}</p>
           </div>
         </div>
       </button>
