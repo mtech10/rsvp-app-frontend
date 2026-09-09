@@ -1,6 +1,5 @@
-import { Routes, Route } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router-dom";
 
-import LandingPage from "./pages/LandingPage";
 import CalendarPage from "./pages/CalendarPage";
 import DiscoverEvents from "./pages/DiscoverEvents";
 import CreateEvent from "./pages/CreateEvent";
@@ -20,6 +19,18 @@ import EditEvent from "./pages/EditEvent";
 import EventDetails from "./pages/EventDetails";
 import Profile from "./pages/Profile";
 import HomePage from "./pages/HomePage";
+import LandingPage from "./pages/LandingPage";
+import { useAuth } from "./context/AuthContext";
+
+function RootPage() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return <div className="min-h-screen" />;
+  }
+
+  return user ? <Navigate to="/events" replace /> : <HomePage />;
+}
 
 export default function App() {
   return (
@@ -29,7 +40,11 @@ export default function App() {
         <Route path="/register" element={<Register />} />
 
         <Route element={<MainLayout />}>
+          {/* Public home page */}
+          <Route path="/" element={<RootPage />} />
           <Route path="/home" element={<HomePage />} />
+
+          {/* Public browsing pages */}
           <Route path="/calendars" element={<CalendarPage />} />
           <Route path="/discover" element={<DiscoverEvents />} />
           <Route path="/events/:id" element={<EventDetails />} />
@@ -40,14 +55,18 @@ export default function App() {
             element={<CategoryPage />}
           />
         </Route>
+
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
-            <Route path="/" element={<LandingPage />} />
+            {/* Logged-in Events page */}
+            <Route path="/events" element={<LandingPage />} />
+
             <Route path="/create" element={<CreateEvent />} />
             <Route path="/my-events" element={<MyEvents />} />
             <Route path="/my-events/:id" element={<ManageEvent />} />
             <Route path="/my-events/:id/edit" element={<EditEvent />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/notifications" element={<NotificationPage />} />
           </Route>
         </Route>
       </Routes>

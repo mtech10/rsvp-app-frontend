@@ -581,7 +581,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="bg-white">
+      {/* <section className="bg-white">
         <div className="mx-auto max-w-7xl px-6 py-10 sm:px-8 lg:px-12">
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
@@ -735,7 +735,7 @@ export default function HomePage() {
             </div>
           )}
         </div>
-      </section>
+      </section> */}
 
       <section className="bg-slate-950">
         <div className="mx-auto max-w-4xl px-6 py-24 text-center sm:px-8">
