@@ -46,6 +46,9 @@ export default function EventOverviewCard({
   addressLabel,
   cityLabel,
 }) {
+  const eventHasEnded =
+    new Date(event.endAt || event.startAt).getTime() < Date.now();
+
   return (
     <div className="mt-8 rounded-3xl border border-slate-200 bg-white p-8 shadow-sm">
       {/* Header */}
@@ -92,15 +95,6 @@ export default function EventOverviewCard({
       {/* Date */}
 
       <div className="mt-8 flex items-center gap-5 overflow-hidden">
-        {/* <div className="rounded-sm p-3 bg-slate-100 border border-slate-200 text-center shadow-sm backdrop-blur-sm min-w-15">
-          <span className="block text-xs font-semibold uppercase tracking-[0.28em] text-slate-600">
-            {date.month}
-          </span>
-          <span className="mt-1 block text-xl font-bold tracking-tight text-slate-800">
-            {date.day}
-          </span>
-        </div> */}
-
         <div className="w-14 overflow-hidden rounded-xl border border-slate-200/80 bg-white text-center shadow-sm">
           <div className="bg-slate-100 py-1 border-b border-slate-200">
             <span className="block text-sm font-bold uppercase tracking-wider text-slate-500/90 leading-none">
@@ -152,13 +146,8 @@ export default function EventOverviewCard({
       <div className="mt-12 border-t border-slate-200 pt-8">
         <h2 className="text-base font-semibold text-slate-900">About Event</h2>
 
-        <div className="mt-5 space-y-5 text-[15px] leading-8 text-slate-600">
-          {event.description
-            ?.split("\n")
-            .filter(Boolean)
-            .map((paragraph, index) => (
-              <p key={index}>{paragraph}</p>
-            ))}
+        <div className="mt-5 max-w-2xl whitespace-pre-line text-[15px] leading-8 text-slate-800">
+          {event.description}
         </div>
       </div>
 
@@ -230,7 +219,7 @@ export default function EventOverviewCard({
               <p className="mt-1 text-sm text-slate-500">Event Organizer</p>
 
               <p className="mt-3 text-sm font-medium text-slate-500">
-                {event.goingCount || 0} Going
+                {event.goingCount || 0} {eventHasEnded ? "Went" : "Going"}
               </p>
             </div>
           </div>

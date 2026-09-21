@@ -293,13 +293,6 @@ const EventDetailsLayout = ({
           />
         )}
 
-        <div className="mt-6 flex items-center justify-between gap-4">
-          <p className="text-sm text-slate-500">
-            {event.goingCount || 0}{" "}
-            {(event.goingCount || 0) === 1 ? "person is" : "people are"} going
-          </p>
-        </div>
-
         {/* Registration is available only while the event is active */}
         {!isOrganizer &&
           !hideRegistration &&

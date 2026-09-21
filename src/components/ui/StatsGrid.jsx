@@ -13,7 +13,7 @@ export default function StatsGrid({
       variants={staggerContainer}
       initial="hidden"
       animate="visible"
-      className={`mt-8 grid grid-cols-2 gap-4 ${columns} ${className}`}
+      className={`mt-5 grid grid-cols-2 gap-3 ${columns} ${className}`}
     >
       {cards.map((card) => (
         <DashboardStatCard

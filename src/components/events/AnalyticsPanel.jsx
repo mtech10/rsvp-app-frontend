@@ -59,7 +59,7 @@ export default function AnalyticsPanel({
 
   return (
     <DashboardSection
-      className="mt-8"
+      className="mt-6"
       title="Event Analytics"
       description="Live performance of your event."
       icon={BarChart3}
