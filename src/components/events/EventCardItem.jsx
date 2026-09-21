@@ -55,12 +55,11 @@ const EventCardItem = ({
           selected ? "border-indigo-500 shadow-lg" : "border-slate-200 bg-white"
         }`}
       >
-        <div className="relative w-32 shrink-0 overflow-hidden">
+        <div className="relative h-35 w-32 overflow-hidden rounded-xl">
           <img
-            src={event.coverUrl || "https://placehold.co/600x400?text=Event"}
+            src={event.coverUrl}
             alt={event.title}
             className="h-full w-full object-cover"
-            loading="lazy"
           />
         </div>
 

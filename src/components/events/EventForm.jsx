@@ -320,19 +320,80 @@ const EventForm = ({ mode = "create", event = null, duplicateId = null }) => {
     }
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   if (!eventName.trim()) return;
+
+  //   setSubmitting(true);
+  //   try {
+  //     const startAt = new Date(
+  //       `${startDate.toISOString().split("T")[0]}T${startTime}`,
+  //     );
+
+  //     const endAt = new Date(
+  //       `${endDate.toISOString().split("T")[0]}T${endTime}`,
+  //     );
+
+  //     const eventData = {
+  //       title: eventName,
+  //       description,
+  //       coverUrl: imageUrl,
+  //       theme,
+  //       startAt,
+  //       endAt,
+  //       timezone: timezone.id,
+  //       locationType: location ? "in_person" : "online",
+  //       venue: location?.name,
+  //       address: location?.address,
+  //       city: location?.address ? getCityFromLabel(location.address) : "",
+  //       visibility,
+  //       ticketType: ticket.isPaid ? "paid" : "free",
+  //       price: ticket.isPaid ? Number(ticket.price) : 0,
+  //       capacity,
+  //       requireApproval,
+  //     };
+
+  //     const savedEvent =
+  //       mode === "create"
+  //         ? await createEvent(eventData)
+  //         : await updateEvent(event._id, eventData);
+
+  //     if (mode === "create") {
+  //       toast.success("Event created successfully.");
+  //     } else {
+  //       toast.success("Event updated successfully.");
+  //     }
+
+  //     navigate(`/my-events/${savedEvent.event._id}`);
+  //   } catch (err) {
+  //     console.error(err);
+  //     toast.error(
+  //       err.message ||
+  //         `Failed to ${mode === "create" ? "create" : "update"} event.`,
+  //     );
+  //   } finally {
+  //     setSubmitting(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!eventName.trim()) return;
 
     setSubmitting(true);
-    try {
-      const startAt = new Date(
-        `${startDate.toISOString().split("T")[0]}T${startTime}`,
-      );
 
-      const endAt = new Date(
-        `${endDate.toISOString().split("T")[0]}T${endTime}`,
-      );
+    try {
+      const getLocalDateString = (date) => {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+
+        return `${year}-${month}-${day}`;
+      };
+
+      const startAt = new Date(`${getLocalDateString(startDate)}T${startTime}`);
+
+      const endAt = new Date(`${getLocalDateString(endDate)}T${endTime}`);
 
       const eventData = {
         title: eventName,
@@ -367,6 +428,7 @@ const EventForm = ({ mode = "create", event = null, duplicateId = null }) => {
       navigate(`/my-events/${savedEvent.event._id}`);
     } catch (err) {
       console.error(err);
+
       toast.error(
         err.message ||
           `Failed to ${mode === "create" ? "create" : "update"} event.`,
