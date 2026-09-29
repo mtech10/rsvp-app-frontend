@@ -171,7 +171,6 @@ const Topbar = () => {
               </span>
 
               <button
-                ref={mobileMenuToggleRef}
                 type="button"
                 onClick={handleCreateEvent}
                 className="hidden text-sm font-medium transition-colors hover:text-slate-900 sm:inline-flex"
@@ -202,6 +201,7 @@ const Topbar = () => {
               <ProfileMenu onLogout={logout} />
 
               <button
+                ref={mobileMenuToggleRef}
                 type="button"
                 onClick={toggleMobileMenu}
                 className="relative z-50 rounded-full p-2 transition hover:bg-slate-100 sm:hidden"
@@ -239,68 +239,71 @@ const Topbar = () => {
 
         <AnimatePresence>
           {user && isMobileMenuOpen && (
-            <>
-              <motion.button
-                key="mobile-menu-backdrop"
-                type="button"
-                aria-label="Close navigation menu"
-                onClick={closeMobileMenu}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.16 }}
-                className="fixed inset-x-0 bottom-0 top-16 z-40 cursor-default bg-slate-950/10 sm:hidden"
-              />
-              <motion.nav
-                key="mobile-navigation"
-                ref={mobileMenuRef}
-                id="mobile-navigation"
-                aria-label="Mobile navigation"
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.18, ease: "easeOut" }}
-                className="absolute inset-x-0 top-full z-50 border-b border-slate-200 bg-white px-4 py-3 shadow-lg sm:hidden"
-              >
-                <div className="mx-auto flex max-w-6xl flex-col gap-1">
-                  {navLinks.map((link) => {
-                    const IconComponent = link.icon;
-                    const destination =
-                      link.name === "Events" ? "/events" : link.to;
+            <motion.button
+              key="mobile-menu-backdrop"
+              type="button"
+              aria-label="Close navigation menu"
+              onClick={closeMobileMenu}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.16 }}
+              className="fixed inset-x-0 bottom-0 top-16 z-40 cursor-default bg-slate-950/10 sm:hidden"
+            />
+          )}
+        </AnimatePresence>
 
-                    return (
-                      <NavLink
-                        key={link.id}
-                        to={destination}
-                        onClick={closeMobileMenu}
-                        className={({ isActive }) =>
-                          `flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
-                            isActive
-                              ? "bg-slate-100 text-slate-900"
-                              : "text-slate-600 hover:bg-slate-50"
-                          }`
-                        }
-                      >
-                        <IconComponent size={18} />
-                        <span>{link.name}</span>
-                      </NavLink>
-                    );
-                  })}
+        <AnimatePresence>
+          {user && isMobileMenuOpen && (
+            <motion.nav
+              key="mobile-navigation"
+              ref={mobileMenuRef}
+              id="mobile-navigation"
+              aria-label="Mobile navigation"
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.18, ease: "easeOut" }}
+              className="absolute inset-x-0 top-full z-50 border-b border-slate-200 bg-white px-4 py-3 shadow-lg sm:hidden"
+            >
+              <div className="mx-auto flex max-w-6xl flex-col gap-1">
+                {navLinks.map((link) => {
+                  const IconComponent = link.icon;
+                  const destination =
+                    link.name === "Events" ? "/events" : link.to;
 
-                  <button
-                    type="button"
-                    onClick={() => {
-                      closeMobileMenu();
-                      handleCreateEvent();
-                    }}
-                    className="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
-                  >
-                    <Plus size={18} />
-                    <span>Create Event</span>
-                  </button>
-                </div>
-              </motion.nav>
-            </>
+                  return (
+                    <NavLink
+                      key={link.id}
+                      to={destination}
+                      onClick={closeMobileMenu}
+                      className={({ isActive }) =>
+                        `flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors ${
+                          isActive
+                            ? "bg-slate-100 text-slate-900"
+                            : "text-slate-600 hover:bg-slate-50"
+                        }`
+                      }
+                    >
+                      <IconComponent size={18} />
+                      <span>{link.name}</span>
+                    </NavLink>
+                  );
+                })}
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    closeMobileMenu();
+                    handleCreateEvent();
+                  }}
+                  className="flex items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium text-slate-600 transition-colors hover:bg-slate-50"
+                >
+                  <Plus size={18} />
+                  <span>Create Event</span>
+                </button>
+              </div>
+            </motion.nav>
           )}
         </AnimatePresence>
       </div>
