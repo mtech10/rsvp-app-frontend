@@ -8,7 +8,7 @@ const Footer = () => {
   return (
     <footer className="border-t border-slate-300 py-4 px-6 bg-white">
       <div className="mx-auto max-w-7xl flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 sm:gap-8">
           <Link
             to="/"
             className="text-slate-500 hover:text-slate-900 transition-colors"
@@ -16,7 +16,7 @@ const Footer = () => {
             <LogoIcon size={20} />
           </Link>
 
-          <div className="flex gap-6 items-center text-sm font-medium">
+          <div className="flex flex-wrap items-center gap-4 text-sm font-medium sm:gap-6">
             {navLinks.map((link) => (
               <NavLink
                 key={link.id}

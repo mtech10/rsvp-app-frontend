@@ -54,25 +54,26 @@ export const staggerContainer = {
 export const dropdownMenu = {
   hidden: {
     opacity: 0,
-    y: -8,
-    scale: 0.98,
+    y: -5,
   },
   visible: {
     opacity: 1,
     y: 0,
     scale: 1,
     transition: {
-      duration: 0.18,
+      duration: 0.2,
+      ease: [0.22, 1, 0.36, 1],
       when: "beforeChildren",
-      staggerChildren: 0.04,
+      staggerChildren: 0.025,
+      delayChildren: 0.025,
     },
   },
   exit: {
     opacity: 0,
-    y: -8,
-    scale: 0.98,
+    y: -3,
     transition: {
-      duration: 0.15,
+      duration: 0.14,
+      ease: [0.4, 0, 1, 1],
     },
   },
 };
@@ -81,11 +82,15 @@ export const dropdownMenu = {
 export const dropdownItem = {
   hidden: {
     opacity: 0,
-    x: -8,
+    y: 4,
   },
   visible: {
     opacity: 1,
-    x: 0,
+    y: 0,
+    transition: {
+      duration: 0.12,
+      ease: "easeOut",
+    },
   },
 };
 

@@ -9,7 +9,6 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
-import { dropdownMenu, dropdownItem } from "../animations/motion";
 export default function ProfileMenu({ onLogout }) {
   const { user } = useAuth();
 
@@ -45,17 +44,23 @@ export default function ProfileMenu({ onLogout }) {
           {initials}
         </div>
 
-        <ChevronDown size={16} />
+        <motion.span
+          animate={{ rotate: open ? 180 : 0 }}
+          transition={{ duration: 0.18, ease: "easeOut" }}
+          className="flex"
+        >
+          <ChevronDown size={16} />
+        </motion.span>
       </button>
 
       <AnimatePresence>
         {open && (
           <motion.div
-            variants={dropdownMenu}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            className="absolute right-0 top-full z-999 mt-3 w-72 rounded-2xl border border-slate-200 bg-white shadow-xl"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.18, ease: "easeOut" }}
+            className="absolute right-0 top-full z-999 mt-3 w-72 origin-top-right rounded-2xl border border-slate-200 bg-white shadow-xl"
           >
             <div className="border-b p-5">
               <h3 className="font-semibold">{user?.name}</h3>
@@ -64,43 +69,37 @@ export default function ProfileMenu({ onLogout }) {
             </div>
 
             <div className="p-2">
-              <motion.div variants={dropdownItem}>
-                <Link
-                  to="/profile"
-                  className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
-                >
-                  <User size={18} />
-                  My Profile
-                </Link>
-              </motion.div>
+              <Link
+                to="/profile"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
+              >
+                <User size={18} />
+                My Profile
+              </Link>
 
-              <motion.div variants={dropdownItem}>
-                <Link
-                  to="/my-events"
-                  className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
-                >
-                  <CalendarDays size={18} />
-                  My Events
-                </Link>
-              </motion.div>
+              <Link
+                to="/my-events"
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-3 rounded-xl p-3 hover:bg-slate-50"
+              >
+                <CalendarDays size={18} />
+                My Events
+              </Link>
 
-              <motion.div variants={dropdownItem}>
-                <button className="flex w-full items-center gap-3 rounded-xl p-3 text-left hover:bg-slate-50">
-                  <Settings size={18} />
-                  Settings
-                </button>
-              </motion.div>
+              <button className="flex w-full items-center gap-3 rounded-xl p-3 text-left hover:bg-slate-50">
+                <Settings size={18} />
+                Settings
+              </button>
               <hr className="my-2" />
 
-              <motion.div variants={dropdownItem}>
-                <button
-                  onClick={onLogout}
-                  className="flex w-full items-center gap-3 rounded-xl p-3 text-left text-red-600 hover:bg-red-50"
-                >
-                  <LogOut size={18} />
-                  Logout
-                </button>
-              </motion.div>
+              <button
+                onClick={onLogout}
+                className="flex w-full items-center gap-3 rounded-xl p-3 text-left text-red-600 hover:bg-red-50"
+              >
+                <LogOut size={18} />
+                Logout
+              </button>
             </div>
           </motion.div>
         )}

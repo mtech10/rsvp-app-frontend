@@ -105,7 +105,7 @@ const LandingPage = () => {
   };
 
   return (
-    <section className="mx-auto max-w-6xl px-20 py-5">
+    <section className="mx-auto max-w-6xl px-4 py-5 sm:px-6 lg:px-20">
       <div className="mb-8 flex items-center justify-between">
         <p className="text-2xl font-semibold text-slate-800">Events</p>
 
